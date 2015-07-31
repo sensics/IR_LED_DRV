@@ -1595,18 +1595,6 @@
     </settings>
   </configuration>
   <group>
-    <name>StdPeriph_Template_Modified</name>
-    <file>
-      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Template\stm8s_conf.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Template\stm8s_it.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Template\stm8s_it.h</name>
-    </file>
-  </group>
-  <group>
     <name>StdPeriph_Drivers</name>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_adc1.c</name>
@@ -1658,6 +1646,15 @@
     </file>
   </group>
   <group>
+    <name>StdPeriph_Template</name>
+    <file>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Template\stm8s_conf.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Template\stm8s_it.h</name>
+    </file>
+  </group>
+  <group>
     <name>User</name>
     <file>
       <name>$PROJ_DIR$\User\array_init.c</name>
@@ -1676,3 +1673,5 @@
     </file>
   </group>
 </project>
+
+
