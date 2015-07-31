@@ -1,0 +1,12 @@
+# Ignore generated stuff
+*.tmp
+*.log
+*.dep
+*.ewt
+/settings/
+
+# Ignore build products except for the output hex files
+Obj/
+List/
+Exe/
+^*.hex
