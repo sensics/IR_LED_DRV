@@ -1,6 +1,27 @@
+/** @file
+    @brief Implementation
+
+    @date 2015
+
+    @author
+    Sensics, Inc.
+    <http://sensics.com/osvr>
+*/
+
+/*
+// Copyright 2015 Sensics, Inc.
+//
+// All rights reserved.
+*/
+
+/* Internal Includes */
+#include "array_init.h"
+
+/* Library/third-party includes */
 #include "stm8s.h"
 
-#include "array_init.h"
+/* Standard includes */
+/* - none - */
 
 __eeprom uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] = 
 {

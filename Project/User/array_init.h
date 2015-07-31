@@ -1,5 +1,23 @@
+/** @file
+    @brief Header for array initialization
+
+    @date 2015
+
+    @author
+    Sensics, Inc.
+    <http://sensics.com/osvr>
+*/
+
+/*
+// Copyright 2015 Sensics, Inc.
+//
+// All rights reserved.
+*/
+
 #ifndef __ARRAY__INIT__
 #define __ARRAY__INIT__
+
+#include "stm8s.h" // for uint8_t without conflicts
 
 #define LED_LINE_LENGTH 5
 #define PATTERN_COUNT   16

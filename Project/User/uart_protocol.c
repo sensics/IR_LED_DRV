@@ -1,7 +1,28 @@
-#include "stm8s.h"
+/** @file
+    @brief Implementation
 
+    @date 2015
+
+    @author
+    Sensics, Inc.
+    <http://sensics.com/osvr>
+*/
+
+/*
+// Copyright 2015 Sensics, Inc.
+//
+// All rights reserved.
+*/
+
+/* Internal Includes */
 #include "uart_protocol.h"
 #include "array_init.h"
+
+/* Library/third-party includes */
+#include "stm8s.h"
+
+/* Standard includes */
+/* - none - */
 
 enum
 {
