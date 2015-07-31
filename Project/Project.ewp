@@ -258,10 +258,10 @@
         </option>
         <option>
           <name>CCIncludePath2</name>
-          <state>$PROJ_DIR$\</state>
           <state>$PROJ_DIR$\User</state>
           <state>$PROJ_DIR$\Config</state>
-          <state>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\inc</state>
+          <state>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Template</state>
+          <state>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\inc</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1057,7 +1057,7 @@
           <state>$PROJ_DIR$\</state>
           <state>$PROJ_DIR$\User</state>
           <state>$PROJ_DIR$\Config</state>
-          <state>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\inc</state>
+          <state>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\inc</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1595,125 +1595,66 @@
     </settings>
   </configuration>
   <group>
-    <name>Config</name>
+    <name>StdPeriph_Template_Modified</name>
     <file>
-      <name>$PROJ_DIR$\Config\stm8s.h</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Template\stm8s_conf.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\Config\stm8s_conf.h</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Template\stm8s_it.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Template\stm8s_it.h</name>
     </file>
   </group>
   <group>
     <name>StdPeriph_Drivers</name>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_adc1.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_adc1.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_adc2.c</name>
-      <excluded>
-        <configuration>Debug</configuration>
-        <configuration>Release</configuration>
-      </excluded>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_awu.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_awu.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_beep.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_beep.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_clk.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_can.c</name>
-      <excluded>
-        <configuration>Debug</configuration>
-        <configuration>Release</configuration>
-      </excluded>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_exti.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_clk.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_flash.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_exti.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_gpio.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_flash.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_i2c.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_gpio.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_itc.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_i2c.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_iwdg.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_itc.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_rst.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_iwdg.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_spi.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_rst.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_tim1.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_spi.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_tim2.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_tim1.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_uart1.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_tim2.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_tim3.c</name>
-      <excluded>
-        <configuration>Debug</configuration>
-        <configuration>Release</configuration>
-      </excluded>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_tim4.c</name>
-      <excluded>
-        <configuration>Release</configuration>
-      </excluded>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_tim5.c</name>
-      <excluded>
-        <configuration>Debug</configuration>
-        <configuration>Release</configuration>
-      </excluded>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_tim6.c</name>
-      <excluded>
-        <configuration>Debug</configuration>
-        <configuration>Release</configuration>
-      </excluded>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_uart1.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_uart2.c</name>
-      <excluded>
-        <configuration>Debug</configuration>
-        <configuration>Release</configuration>
-      </excluded>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_uart3.c</name>
-      <excluded>
-        <configuration>Debug</configuration>
-        <configuration>Release</configuration>
-      </excluded>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_uart4.c</name>
-      <excluded>
-        <configuration>Debug</configuration>
-        <configuration>Release</configuration>
-      </excluded>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\STM8S_StdPeriph_Lib\Libraries\STM8S_StdPeriph_Driver\src\stm8s_wwdg.c</name>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_wwdg.c</name>
     </file>
   </group>
   <group>
@@ -1728,9 +1669,6 @@
       <name>$PROJ_DIR$\User\main.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\User\stm8s_it.c</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\User\uart_protocol.c</name>
     </file>
     <file>
@@ -1738,5 +1676,3 @@
     </file>
   </group>
 </project>
-
-
