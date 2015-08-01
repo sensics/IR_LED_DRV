@@ -10,3 +10,6 @@ Each LED has a "bright" state and a "dim" state, corresponding to '1' and '0' in
 The pattern itself can be designed using the "LED Encoding" project
 
 It uses IAR Embedded Workbench to compile.
+
+Source code is in 'user' subdirectory
+IAR files in 'vendor' subdirectory
