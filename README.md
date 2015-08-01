@@ -13,3 +13,5 @@ It uses IAR Embedded Workbench to compile.
 
 Source code is in 'user' subdirectory
 IAR files in 'vendor' subdirectory
+
+Hardware files to be added shortly
