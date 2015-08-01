@@ -14,4 +14,4 @@ It uses IAR Embedded Workbench (https://www.iar.com/iar-embedded-workbench/) to 
 Source code is in 'user' subdirectory
 IAR files in 'vendor' subdirectory
 
-Hardware files to be added shortly
+Hardware files in 'Schematics' subdirectory
