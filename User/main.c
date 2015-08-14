@@ -127,8 +127,8 @@ void set_flash_next_interrupt_time( uint16_t flash_time_us );
 #define MAX_INTERVAL_PERIOD_ADJUSTMENT          15
 
 uint16_t _flash_blank_period                 =  25;   // max 2000
-uint16_t _flash_interval_period              = 200;   // max 2000
-uint16_t _flash_period                       = 500;   // max 2000
+uint16_t _flash_interval_period              = 125;   // max 2000
+uint16_t _flash_period                       = 400;   // max 2000
 
 uint16_t _flash_blank_period_as_timer;
 uint16_t _flash_interval_period_as_timer;
