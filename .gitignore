@@ -1,5 +1,6 @@
 # Ignore generated stuff
 *.tmp
+*.tmp.c
 *.log
 *.dep
 *.ewt
