@@ -1059,6 +1059,7 @@
           <state>$PROJ_DIR$\User</state>
           <state>$PROJ_DIR$\Config</state>
           <state>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\inc</state>
+          <state>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Template</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
