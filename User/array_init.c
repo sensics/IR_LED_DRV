@@ -26,7 +26,7 @@
 /* - none - */
 
 // clang-format off
-__eeprom uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
+EEPROM uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
 {
     {29,0,32,136,16},
     {9,0,192,26,4},
@@ -47,9 +47,9 @@ __eeprom uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
 };
 // clang-format on
 
-__tiny uint8_t pattern_array[PATTERN_COUNT][LED_LINE_LENGTH];
+TINY uint8_t pattern_array[PATTERN_COUNT][LED_LINE_LENGTH];
 
-__tiny uint8_t ir_led_driver_buffer[PATTERN_COUNT][LED_LINE_LENGTH * 2];
+TINY uint8_t ir_led_driver_buffer[PATTERN_COUNT][LED_LINE_LENGTH * 2];
 
 void line_array_init(uint8_t index, uint8_t *value)
 {

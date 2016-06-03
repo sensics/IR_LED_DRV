@@ -41,8 +41,8 @@
 #include <stdint.h>
 
 // Remove embedded-only keywords
-#define __tiny
-#define __eeprom
+#define TINY
+#define EEPROM
 
 #endif
 

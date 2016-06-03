@@ -22,7 +22,7 @@
 #include "stm8s.h"
 
 /* Standard includes */
-#include <stdbool.h>
+/* - none - */
 
 enum
 {
@@ -269,7 +269,7 @@ uint8_t hex_to_int(uint8_t ch)
     return ch - 'A' + 10;
   if (ch >= 'a' && ch <= 'f')
     return ch - 'a' + 10;
-  return 255;
+  return U8_MAX;
 }
 
 #define PROTO_MAX_HEX_DIGIT_VAL 0x0f
@@ -279,17 +279,17 @@ bool parseHexUint8(const uint8_t *str, uint8_t *out)
 {
   if (!out || !str)
   {
-    return false;
+    return FALSE;
   }
   uint8_t value_hi = hex_to_int(str[0]);
   uint8_t value_lo = hex_to_int(str[1]);
   if (value_lo > PROTO_MAX_HEX_DIGIT_VAL || value_hi > PROTO_MAX_HEX_DIGIT_VAL)
   {
     protocol_output_error("value", 5);
-    return false;
+    return FALSE;
   }
   *out = value_lo | (value_hi << 4);
-  return true;
+  return TRUE;
 }
 
 /// Parses four hex digits from a string
@@ -297,7 +297,7 @@ bool parseHexUint16(const uint8_t *str, uint16_t *out)
 {
   if (!out || !str)
   {
-    return false;
+    return FALSE;
   }
   uint8_t value_12 = hex_to_int(str[0]);
   uint8_t value_08 = hex_to_int(str[1]);
@@ -307,12 +307,12 @@ bool parseHexUint16(const uint8_t *str, uint16_t *out)
       value_00 > PROTO_MAX_HEX_DIGIT_VAL)
   {
     protocol_output_error("value", 5);
-    return false;
+    return FALSE;
   }
 
   *out = (((uint16_t)value_12) << 12) | (((uint16_t)value_08) << 8) | (((uint16_t)value_04) << 4) |
          (((uint16_t)value_00) << 0);
-  return true;
+  return TRUE;
 }
 
 extern uint8_t _simulation_period;
