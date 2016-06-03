@@ -1601,12 +1601,24 @@
     <name>StdPeriph_Drivers</name>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_adc1.c</name>
+      <excluded>
+        <configuration>Debug</configuration>
+        <configuration>Release</configuration>
+      </excluded>
     </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_awu.c</name>
+      <excluded>
+        <configuration>Debug</configuration>
+        <configuration>Release</configuration>
+      </excluded>
     </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_beep.c</name>
+      <excluded>
+        <configuration>Debug</configuration>
+        <configuration>Release</configuration>
+      </excluded>
     </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_clk.c</name>
@@ -1616,21 +1628,41 @@
     </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_flash.c</name>
+      <excluded>
+        <configuration>Debug</configuration>
+        <configuration>Release</configuration>
+      </excluded>
     </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_gpio.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_i2c.c</name>
+      <excluded>
+        <configuration>Debug</configuration>
+        <configuration>Release</configuration>
+      </excluded>
     </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_itc.c</name>
+      <excluded>
+        <configuration>Debug</configuration>
+        <configuration>Release</configuration>
+      </excluded>
     </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_iwdg.c</name>
+      <excluded>
+        <configuration>Debug</configuration>
+        <configuration>Release</configuration>
+      </excluded>
     </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_rst.c</name>
+      <excluded>
+        <configuration>Debug</configuration>
+        <configuration>Release</configuration>
+      </excluded>
     </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_spi.c</name>
@@ -1646,6 +1678,10 @@
     </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_wwdg.c</name>
+      <excluded>
+        <configuration>Debug</configuration>
+        <configuration>Release</configuration>
+      </excluded>
     </file>
   </group>
   <group>
