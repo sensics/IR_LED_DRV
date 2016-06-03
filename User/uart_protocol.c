@@ -22,7 +22,7 @@
 #include "stm8s.h"
 
 /* Standard includes */
-/* - none - */
+#include <stdbool.h>
 
 enum
 {
@@ -265,6 +265,51 @@ uint8_t hex_to_int( uint8_t ch )
   return 255;
 }
 
+#define PROTO_MAX_HEX_DIGIT_VAL 0x0f
+
+/// Parses two hex digits from a string
+bool parseHexUint8(const uint8_t * str, uint8_t *out)
+{
+  if (!out || !str) {
+    return false;
+  }
+  uint8_t value_hi = hex_to_int(str[0]);
+  uint8_t value_lo = hex_to_int(str[1]);
+  if(value_lo > PROTO_MAX_HEX_DIGIT_VAL || value_hi > PROTO_MAX_HEX_DIGIT_VAL )
+  {
+    protocol_output_error( "value", 5 );
+    return false;
+  }
+  *out  = value_lo | (value_hi << 4);
+  return true;
+}
+
+/// Parses four hex digits from a string
+bool parseHexUint16(const uint8_t * str, uint16_t *out)
+{
+  if (!out || !str) {
+    return false;
+  }
+  uint8_t value_12 = hex_to_int(str[0]);
+  uint8_t value_08 = hex_to_int(str[1]);
+  uint8_t value_04 = hex_to_int(str[2]);
+  uint8_t value_00 = hex_to_int(str[3]);
+  if( value_12 > PROTO_MAX_HEX_DIGIT_VAL ||
+      value_08 > PROTO_MAX_HEX_DIGIT_VAL ||
+      value_04 > PROTO_MAX_HEX_DIGIT_VAL ||
+      value_00 > PROTO_MAX_HEX_DIGIT_VAL )
+  {
+    protocol_output_error( "value", 5 );
+    return false;
+  }
+
+  *out = (((uint16_t)value_12) << 12) |
+         (((uint16_t)value_08) << 8) |
+         (((uint16_t)value_04) << 4) |
+         (((uint16_t)value_00) << 0);
+  return true;
+}
+
 extern uint8_t  _simulation_period;
 extern uint16_t _flash_period;
 extern uint16_t _flash_blank_period;
@@ -291,23 +336,10 @@ void protocol_parse_flash_write()
     return;
   }
 
-  uint8_t value_12 = hex_to_int(_protocol_line[3]);
-  uint8_t value_08 = hex_to_int(_protocol_line[4]);
-  uint8_t value_04 = hex_to_int(_protocol_line[5]);
-  uint8_t value_00 = hex_to_int(_protocol_line[6]);
-  if( value_12 < 0 || value_12 > 15 ||
-      value_08 < 0 || value_08 > 15 || 
-      value_04 < 0 || value_04 > 15 ||
-      value_00 < 0 || value_00 > 15 )
-  {
-    protocol_output_error( "value", 5 ); 
+  uint16_t value;
+  if (!parseHexUint16(&(_protocol_line[3]), &value)) {
     return;
   }
-  
-  uint16_t value = (((uint16_t)value_12) << 12) |
-                  (((uint16_t)value_08) << 8) |
-                  (((uint16_t)value_04) << 4) |
-                  (((uint16_t)value_00) << 0);
 
   if( value < 10 || value > 10000 )
   {
@@ -353,28 +385,14 @@ void protocol_parse_blank_write()
     protocol_output_error( "delimiter", 9 ); 
     return;
   }
-
-  uint8_t value_12 = hex_to_int(_protocol_line[3]);
-  uint8_t value_08 = hex_to_int(_protocol_line[4]);
-  uint8_t value_04 = hex_to_int(_protocol_line[5]);
-  uint8_t value_00 = hex_to_int(_protocol_line[6]);
-  if( value_12 < 0 || value_12 > 15 ||
-      value_08 < 0 || value_08 > 15 || 
-      value_04 < 0 || value_04 > 15 ||
-      value_00 < 0 || value_00 > 15 )
-  {
-    protocol_output_error( "value", 5 ); 
+  uint16_t value;
+  if (!parseHexUint16(&(_protocol_line[3]), &value)) {
     return;
   }
-  
-  uint16_t value = (((uint16_t)value_12) << 12) |
-                  (((uint16_t)value_08) << 8) |
-                  (((uint16_t)value_04) << 4) |
-                  (((uint16_t)value_00) << 0);
 
   if( value < 10 || value > 10000 )
   {
-    protocol_output_error( "limit", 5 ); 
+    protocol_output_error( "limit", 5 );
     return;
   }
   
@@ -413,23 +431,10 @@ void protocol_parse_interval_write()
     return;
   }
 
-  uint8_t value_12 = hex_to_int(_protocol_line[3]);
-  uint8_t value_08 = hex_to_int(_protocol_line[4]);
-  uint8_t value_04 = hex_to_int(_protocol_line[5]);
-  uint8_t value_00 = hex_to_int(_protocol_line[6]);
-  if( value_12 < 0 || value_12 > 15 ||
-      value_08 < 0 || value_08 > 15 || 
-      value_04 < 0 || value_04 > 15 ||
-      value_00 < 0 || value_00 > 15 )
-  {
-    protocol_output_error( "value", 5 ); 
+  uint16_t value;
+  if (!parseHexUint16(&(_protocol_line[3]), &value)) {
     return;
   }
-  
-  uint16_t value = (((uint16_t)value_12) << 12) |
-                  (((uint16_t)value_08) << 8) |
-                  (((uint16_t)value_04) << 4) |
-                  (((uint16_t)value_00) << 0);
 
   if( value < 10 || value > 10000 )
   {
@@ -472,16 +477,10 @@ void protocol_parse_sim_write()
     return;
   }
 
-  uint8_t value_hi = hex_to_int(_protocol_line[3]);
-  uint8_t value_lo = hex_to_int(_protocol_line[4]);
-  if( value_lo < 0 || value_lo > 15 ||
-      value_hi < 0 || value_hi > 15 )
-  {
-    protocol_output_error( "value", 5 ); 
+  uint8_t value;
+  if (!parseHexUint8(&(_protocol_line[3]), &value)) {
     return;
   }
-  
-  uint8_t value  = value_lo | (((uint16_t)value_hi) << 4);
 
   if( value < 50 )
   {
@@ -526,7 +525,7 @@ void protocol_parse_pattern_write()
   }
 
   uint8_t index = hex_to_int(_protocol_line[3]);
-  if( index < 0 || index > 15 )
+  if( index > PROTO_MAX_HEX_DIGIT_VAL )
   {
     protocol_output_error( "index", 9 ); 
     return;
@@ -534,22 +533,23 @@ void protocol_parse_pattern_write()
   
   for( uint8_t i = 0, j = 0; i < LED_LINE_LENGTH; i++ )
   {
-     uint8_t value_hi = hex_to_int(_protocol_line[5 + j++]);
-     uint8_t value_lo = hex_to_int(_protocol_line[5 + j++]);
+
+     uint8_t value;
+     bool parseSuccess = parseHexUint8(&(_protocol_line[5 + j]), &value);
+     j += 2;
      if( _protocol_line[5 + j++] != UART_CHARACTER_COMMA )
      {
         protocol_output_error( "comma", 5 ); 
         return;
      }
 
-     if( value_lo < 0 || value_lo > 15 ||
-         value_hi < 0 || value_hi > 15 )
+     if (!parseSuccess)
      {
         protocol_output_error( "value", 5 ); 
         return;
      }
-     
-     pattern_array[index][i] = value_lo | (((uint16_t)value_hi) << 4);
+
+     pattern_array[index][i] = value;
   }
   
   line_array_init( index, pattern_array[index] );
@@ -568,7 +568,7 @@ void protocol_parse_pattern_read()
   }
 
   uint8_t index = hex_to_int(_protocol_line[3]);
-  if( index < 0 || index > 15 )
+  if( index > PROTO_MAX_HEX_DIGIT_VAL )
   {
     protocol_output_error( "index", 5 ); 
     return;
