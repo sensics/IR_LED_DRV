@@ -52,6 +52,8 @@
 
 #define MCU_CLOCK 16000000
 
+#define SYNC_DELAY_US 400
+
 uint16_t t_light, t_dark = 0;
 uint8_t index_16 = 15;
 
@@ -60,6 +62,27 @@ void Delay(uint16_t n)
   while (n--)
     ;
 }
+
+static inline unsigned short usec_to_ticks(unsigned short usec)
+{
+// Based on how long the following loop is for each compiler:
+// while (n--) {}
+#if defined(__ICCSTM8__)
+  // this loop is ldw, decw, tnzw, jrne on IAR - so 5 (5.5?) cycles.
+  return ((MCU_CLOCK * usec / 1000000UL) - 5) / 5;
+#else
+#error unported to this compiler
+#endif
+}
+
+static inline void delay_ticks(unsigned short ticks)
+{
+  while (ticks--)
+  {
+  }
+}
+
+#define DELAY_US(US) delay_ticks(usec_to_ticks(US))
 
 void pwm_timer(uint16_t t1, uint16_t t2)
 {
@@ -176,6 +199,9 @@ void flash_process_start()
 {
   // disable external interrupt
   GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_NO_IT);
+
+  // Wait a bit before starting the flash process to account for sync mistiming.
+  DELAY_US(SYNC_DELAY_US);
 
   // turn-on flash
   GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
