@@ -82,8 +82,10 @@ void default_array_init(void)
 {
   for (uint8_t i = 0; i < PATTERN_COUNT; i++)
   {
-    for (uint8_t j        = 0; j < LED_LINE_LENGTH; j++)
+    for (uint8_t j = 0; j < LED_LINE_LENGTH; j++)
+    {
       pattern_array[i][j] = default_pattern_array[i][j];
+    }
     line_array_init(i, (uint8_t *)pattern_array[i]);
   }
 }
