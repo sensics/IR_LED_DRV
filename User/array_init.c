@@ -25,6 +25,7 @@
 /* Standard includes */
 /* - none - */
 
+// clang-format off
 __eeprom uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
 {
     {29,0,32,136,16},
@@ -44,6 +45,7 @@ __eeprom uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
     {140,144,4,32,64},
     {13,69,0,32,64}
 };
+// clang-format on
 
 __tiny uint8_t pattern_array[PATTERN_COUNT][LED_LINE_LENGTH];
 
