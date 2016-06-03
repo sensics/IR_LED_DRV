@@ -12,5 +12,5 @@ The pattern itself can be designed using the "LED Encoding" project
 It uses IAR Embedded Workbench (https://www.iar.com/iar-embedded-workbench/) to compile. It is small enough to build with the free Kickstart license, though note that you will get a sales call after registering for one.
 
 - Source code is in 'user' subdirectory
-- ST-supplied library files in 'vendor' subdirectory
+- ST-supplied library files in 'vendor' subdirectory - extracted from release version 2.2.0 available at <http://www.st.com/web/en/catalog/tools/FM147/CL1794/SC1807/SS1754/PF258009>
 - Hardware files in 'Schematics' subdirectory
