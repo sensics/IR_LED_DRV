@@ -228,6 +228,7 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
   }
   else
   {
+    /// @todo is the 5 here corresponding to LED_LINE_LENGTH?
     if (_blankIndex < 5)
     {
       _update_led_blank = 1;
@@ -293,6 +294,7 @@ void set_flash_timer_max_period(uint16_t flash_time_us)
 
   TIM1_Cmd(DISABLE);
 
+  // prescaler is set to 15: 2^15 = 32k
   TIM1_TimeBaseInit((MCU_CLOCK / 1000000) - 1, TIM1_COUNTERMODE_UP, flash_time_us, 0);
   TIM1_ClearFlag(TIM1_FLAG_UPDATE);
   TIM1_SetCounter(0);
@@ -395,6 +397,7 @@ void main(void)
 
     if (update_led)
     {
+      // Move to the next value in the patterns
       update_led = 0;
 
       if (_simulation_in_process)
@@ -402,6 +405,7 @@ void main(void)
       else
         Send_array_spi_data(); // Serialize 80 (96) bit for IR LED's drivers
 
+      // this is effectively index_16 = (index_16 + 1) % PATTERN_COUNT
       index_16++;
       index_16 &= 0x0F;
     }
