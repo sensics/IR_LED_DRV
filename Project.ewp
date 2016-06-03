@@ -1290,7 +1290,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state>ir_led_drvt_14_07_test.hex</state>
+          <state>ir_led_dev.hex</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
