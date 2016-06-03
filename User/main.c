@@ -24,12 +24,27 @@
 /* Standard includes */
 #include "intrinsics.h" //__enable_interrupt ().
 
+// PB0: IR_LED_PWR_EN active high
+#define PORT_LED_PWR_EN GPIOB
+#define PIN_LED_PWR_EN GPIO_PIN_0
+
+#define PORT_LATCH GPIOC
 #define PIN_LATCH GPIO_PIN_2
+
+#define PORT_N_OE GPIOC
 #define PIN_N_OE GPIO_PIN_3
+
+#define PORT_CAMERA_SYNC GPIOD
 #define PIN_CAMERA_SYNC GPIO_PIN_7
+#define EXTI_CAMERA_SYNC EXTI_PORT_GPIOD
+
+#define PORT_TESTPOINT_7 GPIOD
 #define PIN_TESTPOINT_7 GPIO_PIN_0
+#define PORT_TESTPOINT_8 GPIOD
 #define PIN_TESTPOINT_8 GPIO_PIN_2
+#define PORT_TESTPOINT_9 GPIOD
 #define PIN_TESTPOINT_9 GPIO_PIN_3
+#define PORT_TESTPOINT_10 GPIOD
 #define PIN_TESTPOINT_10 GPIO_PIN_4
 
 #define BIT_CRCEN (1 << 5)
@@ -48,9 +63,9 @@ void Delay(uint16_t n)
 
 void pwm_timer(uint16_t t1, uint16_t t2)
 {
-  GPIO_WriteLow(GPIOC, PIN_N_OE);
+  GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
   Delay(t1);
-  GPIO_WriteHigh(GPIOC, PIN_N_OE);
+  GPIO_WriteHigh(PORT_N_OE, PIN_N_OE);
   Delay(t2);
 }
 
@@ -64,7 +79,7 @@ void SPI_SendByte(uint8_t data)
 
 void Send_array_spi_data()
 {
-  GPIO_WriteLow(GPIOC, PIN_LATCH); // Prepare driver latch enable for the next data latch
+  GPIO_WriteLow(PORT_LATCH, PIN_LATCH); // Prepare driver latch enable for the next data latch
 
   SPI_SendByte(0); // for 96 bit EVB
   SPI_SendByte(0); // for 96 bit EVB
@@ -160,10 +175,10 @@ uint8_t _flash_on          = 0;
 void flash_process_start()
 {
   // disable external interrupt
-  GPIO_Init(GPIOD, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_NO_IT);
+  GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_NO_IT);
 
   // turn-on flash
-  GPIO_WriteLow(GPIOC, PIN_N_OE);
+  GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
   // GPIO_WriteLow( GPIOD, PIN_TESTPOINT_10 );
 
   // process timer restart
@@ -193,16 +208,16 @@ uint8_t _update_led_blank = 0;
 // called by hardware timer (process timer)
 INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
 {
-  GPIO_WriteHigh(GPIOD, PIN_TESTPOINT_10);
+  GPIO_WriteHigh(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 
   // turn on/off flash
   if (_flash_on)
-    GPIO_WriteLow(GPIOC, PIN_N_OE);
+    GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
   else
-    GPIO_WriteHigh(GPIOC, PIN_N_OE);
+    GPIO_WriteHigh(PORT_N_OE, PIN_N_OE);
 
   // test pulse on T9
-  GPIO_WriteLow(GPIOD, PIN_TESTPOINT_9);
+  GPIO_WriteLow(PORT_TESTPOINT_9, PIN_TESTPOINT_9);
 
   // stop timer
   if (_flash_on)
@@ -225,8 +240,8 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
 
       TIM1_SetCounter(_flash_period_as_timer);
 
-      // enable external interrrupt
-      GPIO_Init(GPIOD, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
+      // enable external interrupt on sync pin (floating)
+      GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
 
       // allow new pattern to be written to LEDs
       update_led = 1;
@@ -237,7 +252,7 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
   // Cleat Interrupt Pending bit
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
 
-  GPIO_WriteLow(GPIOD, PIN_TESTPOINT_10);
+  GPIO_WriteLow(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 }
 
 int8_t _simulation_in_process = 0;
@@ -246,7 +261,7 @@ int8_t _simulation_in_process = 0;
 INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
 {
   // test point output
-  GPIO_WriteReverse(GPIOD, PIN_TESTPOINT_8);
+  GPIO_WriteReverse(PORT_TESTPOINT_8, PIN_TESTPOINT_8);
 
   // Cleat Interrupt Pending bit
   TIM2_ClearITPendingBit(TIM2_IT_UPDATE);
@@ -261,7 +276,7 @@ INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
 INTERRUPT_HANDLER(TLI_IRQHandler, 0)
 {
   // test point output
-  GPIO_WriteReverse(GPIOD, PIN_TESTPOINT_7);
+  GPIO_WriteReverse(PORT_TESTPOINT_7, PIN_TESTPOINT_7);
 
   // simulation timer restart
   TIM2_SetCounter(0);
@@ -319,13 +334,15 @@ void main(void)
   CLK->SWR = 0xB4;
   CLK_CCOCmd(ENABLE);
 
-  GPIO_Init(GPIOB, GPIO_PIN_0, GPIO_MODE_OUT_PP_HIGH_SLOW); // IR_LED_PWR_EN active high
+  GPIO_Init(PORT_LED_PWR_EN, PIN_LED_PWR_EN, GPIO_MODE_OUT_PP_HIGH_SLOW); // PB0: IR_LED_PWR_EN active high
   UART1_Init(115200, UART1_WORDLENGTH_8D, UART1_STOPBITS_1, UART1_PARITY_NO, UART1_SYNCMODE_CLOCK_DISABLE,
              UART1_MODE_TXRX_ENABLE); // UART1 init
-  GPIO_Init(GPIOC, PIN_LATCH, GPIO_MODE_OUT_PP_LOW_SLOW);
-  GPIO_Init(GPIOC, PIN_N_OE, GPIO_MODE_OUT_PP_HIGH_SLOW);
-  GPIO_Init(GPIOC, GPIO_PIN_7, GPIO_MODE_OUT_PP_HIGH_SLOW);
-  // GPIO_Init(GPIOC,GPIO_PIN_6,GPIO_MODE_OUT_PP_LOW_SLOW);
+  GPIO_Init(PORT_LATCH, PIN_LATCH, GPIO_MODE_OUT_PP_LOW_SLOW);
+  GPIO_Init(PORT_N_OE, PIN_N_OE, GPIO_MODE_OUT_PP_HIGH_SLOW);
+  GPIO_Init(GPIOC, GPIO_PIN_7, GPIO_MODE_OUT_PP_HIGH_SLOW); // "DATA1" on HDK 1.2 schematics
+  // GPIO_Init(GPIOC,GPIO_PIN_6,GPIO_MODE_OUT_PP_LOW_SLOW); // "DATA0"  on HDK
+  // 1.2 schematics
+
   // SPI_DeInit();
   SPI_Init(SPI_FIRSTBIT_MSB, SPI_BAUDRATEPRESCALER_2, SPI_MODE_MASTER, SPI_CLOCKPOLARITY_LOW, SPI_CLOCKPHASE_1EDGE,
            SPI_DATADIRECTION_2LINES_FULLDUPLEX, SPI_NSS_SOFT,
@@ -333,16 +350,16 @@ void main(void)
   // SPI->CR2 &= ~(BIT_CRCEN|BIT_CRCNEXT);
   SPI_Cmd(ENABLE);
 
-  // Init test points outputs
+  // Init test points outputs on port D
   GPIO_DeInit(GPIOD);
-  GPIO_Init(GPIOD, PIN_TESTPOINT_7, GPIO_MODE_OUT_PP_LOW_SLOW);
-  GPIO_Init(GPIOD, PIN_TESTPOINT_8, GPIO_MODE_OUT_PP_LOW_SLOW);
-  GPIO_Init(GPIOD, PIN_TESTPOINT_9, GPIO_MODE_OUT_PP_LOW_SLOW);
-  GPIO_Init(GPIOD, PIN_TESTPOINT_10, GPIO_MODE_OUT_PP_HIGH_SLOW);
+  GPIO_Init(PORT_TESTPOINT_7, PIN_TESTPOINT_7, GPIO_MODE_OUT_PP_LOW_SLOW);
+  GPIO_Init(PORT_TESTPOINT_8, PIN_TESTPOINT_8, GPIO_MODE_OUT_PP_LOW_SLOW);
+  GPIO_Init(PORT_TESTPOINT_9, PIN_TESTPOINT_9, GPIO_MODE_OUT_PP_LOW_SLOW);
+  GPIO_Init(PORT_TESTPOINT_10, PIN_TESTPOINT_10, GPIO_MODE_OUT_PP_HIGH_SLOW);
 
   // Init external IRQ
-  GPIO_Init(GPIOD, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
-  EXTI_SetExtIntSensitivity(EXTI_PORT_GPIOD, EXTI_SENSITIVITY_FALL_ONLY);
+  GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
+  EXTI_SetExtIntSensitivity(EXTI_CAMERA_SYNC, EXTI_SENSITIVITY_FALL_ONLY);
   EXTI_SetTLISensitivity(EXTI_TLISENSITIVITY_FALL_ONLY);
 
   // timer initialization (simulation timer)
