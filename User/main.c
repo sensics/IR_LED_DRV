@@ -47,8 +47,10 @@
 #define PORT_TESTPOINT_10 GPIOD
 #define PIN_TESTPOINT_10 GPIO_PIN_4
 
+#if 0
 #define BIT_CRCEN (1 << 5)
 #define BIT_CRCNEXT (1 << 4)
+#endif
 
 #define MCU_CLOCK 16000000
 
@@ -58,7 +60,9 @@
 
 #define ENABLE_SIMULATION
 
+#if 0
 uint16_t t_light, t_dark = 0;
+#endif
 uint8_t index_16 = 15;
 
 /// @name Timer 1 values
