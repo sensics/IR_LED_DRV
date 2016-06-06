@@ -52,10 +52,33 @@
 
 #define MCU_CLOCK 16000000
 
-#define SYNC_DELAY_US 400
+/// Delay at the beginning of of the flash process
+//#define SYNC_DELAY_US 4500
+#define SYNC_DELAY_MS 5
+
+#define ENABLE_SIMULATION
 
 uint16_t t_light, t_dark = 0;
 uint8_t index_16 = 15;
+
+/// @name Timer 1 values
+/// @brief I believe the units are 0.05ms
+/// @{
+/// @brief aka 10 ms
+#define MAX_FLASH_PERIOD 2000
+
+/// Offset taken (reducing timer duration) to account for computational overhead (?) when setting flash period
+#define MAX_FLASH_PERIOD_ADJUSTMENT 20
+/// Offset taken (reducing timer duration) to account for computational overhead (?) when setting blank period
+#define MAX_BLANK_PERIOD_ADJUSTMENT 15
+/// Offset taken (reducing timer duration) to account for computational overhead (?) when setting interval period
+#define MAX_INTERVAL_PERIOD_ADJUSTMENT 15
+
+uint16_t _flash_blank_period    = 25;  // max 2000
+uint16_t _flash_interval_period = 125; // max 2000
+uint16_t _flash_period          = 400; // max 2000
+
+/// @}
 
 void Delay(uint16_t n)
 {
@@ -82,14 +105,14 @@ static inline void delay_ticks(unsigned short ticks)
   }
 }
 
-#define DELAY_US(US) delay_ticks(usec_to_ticks(US))
-
-void pwm_timer(uint16_t t1, uint16_t t2)
+static void delay_us(unsigned short usec) { delay_ticks(usec_to_ticks(usec)); }
+static void delay_ms(unsigned short msec)
 {
-  GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
-  Delay(t1);
-  GPIO_WriteHigh(PORT_N_OE, PIN_N_OE);
-  Delay(t2);
+  unsigned short ticks_per_ms = usec_to_ticks(1000);
+  do
+  {
+    delay_ticks(ticks_per_ms);
+  } while (--msec);
 }
 
 void SPI_SendByte(uint8_t data)
@@ -113,21 +136,23 @@ void Send_array_spi_data()
     SPI_SendByte(*ptr++);
 
   Delay(1);
-  GPIO_WriteHigh(GPIOC, PIN_LATCH);
+  GPIO_WriteHigh(PORT_LATCH, PIN_LATCH);
 }
 
 int _blankIndex = 0;
 void Send_blanks_spi_data()
 {
-  GPIO_WriteLow(GPIOC, PIN_LATCH); // Prepare driver latch enable for the next data latch
+  GPIO_WriteLow(PORT_LATCH, PIN_LATCH); // Prepare driver latch enable for the next data latch
 
   SPI_SendByte(0); // for 96 bit EVB
   SPI_SendByte(0); // for 96 bit EVB
 
-  for (int i = 0; i < 5; i++)
+  for (int i = 0; i < LED_LINE_LENGTH; i++)
   {
     if (i == _blankIndex)
     {
+      /// @todo For one "blank" interval per process, each LED is illuminated, to provide "dim" - is this correct
+      /// understanding?
       SPI_SendByte(0xFF);
       SPI_SendByte(0xFF);
     }
@@ -139,7 +164,7 @@ void Send_blanks_spi_data()
   }
 
   Delay(1);
-  GPIO_WriteHigh(GPIOC, PIN_LATCH);
+  GPIO_WriteHigh(PORT_LATCH, PIN_LATCH);
 }
 
 //  Send a message to the debug port (UART1).
@@ -156,34 +181,29 @@ void Printf(char *message)
   }
 }
 
+#if 0
 void set_flash_next_interrupt_time(uint16_t flash_time_us);
-
-#define MAX_FLASH_PERIOD 2000
-
-#define MAX_FLASH_PERIOD_ADJUSTMENT 20
-#define MAX_BLANK_PERIOD_ADJUSTMENT 15
-#define MAX_INTERVAL_PERIOD_ADJUSTMENT 15
-
-uint16_t _flash_blank_period    = 25;  // max 2000
-uint16_t _flash_interval_period = 125; // max 2000
-uint16_t _flash_period          = 400; // max 2000
+#endif
 
 uint16_t _flash_blank_period_as_timer;
 uint16_t _flash_interval_period_as_timer;
 uint16_t _flash_period_as_timer;
 
+/// Set time from "start" or "sync signal" starting flash process to LEDs initially on.
 void set_flash_period(uint16_t period)
 {
   _flash_period          = period;
   _flash_period_as_timer = MAX_FLASH_PERIOD - (_flash_period - MAX_FLASH_PERIOD_ADJUSTMENT);
 }
 
+/// Set time from LEDs on to LEDs off between a pair of blanks.
 void set_blank_period(uint16_t period)
 {
   _flash_blank_period          = period;
   _flash_blank_period_as_timer = MAX_FLASH_PERIOD - (_flash_blank_period - MAX_BLANK_PERIOD_ADJUSTMENT);
 }
 
+/// Set time between LEDs on during flash process.
 void set_interval_period(uint16_t period)
 {
   _flash_interval_period          = period;
@@ -200,30 +220,36 @@ void flash_process_start()
   // disable external interrupt
   GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_NO_IT);
 
-  // Wait a bit before starting the flash process to account for sync mistiming.
-  DELAY_US(SYNC_DELAY_US);
+// Wait a bit before starting the flash process to account for sync mistiming.
+
+#ifdef SYNC_DELAY_MS
+  delay_ms(SYNC_DELAY_MS);
+#endif
+#ifdef SYNC_DELAY_US
+  delay_us(SYNC_DELAY_US);
+#endif
 
   // turn-on flash
   GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
   // GPIO_WriteLow( GPIOD, PIN_TESTPOINT_10 );
 
   // process timer restart
-  // TIM1_SetCounter(0);
-  // set_flash_next_interrupt_time( _flash_period-20 );
   TIM1_SetCounter(_flash_period_as_timer);
 
   // start process timer
   TIM1_Cmd(ENABLE);
 
   // test pulse on T9
-  GPIO_WriteHigh(GPIOD, PIN_TESTPOINT_9);
+  GPIO_WriteHigh(PORT_TESTPOINT_9, PIN_TESTPOINT_9);
 
-  // start blanc sequence
+  // start blank sequence
   _blankIndex = 0;
   _flash_on   = 0;
 }
 
+#if 0
 void set_flash_pulse_width_naked(uint16_t flash_time_us);
+#endif
 
 // INT     -______________________
 // FLASH   _---_--_--_--_--_--____
@@ -248,23 +274,29 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
   // stop timer
   if (_flash_on)
   {
+    // If we just turned the flash on, come back in here after flash_blank_period.
+    // (But, we'll go to the "else" branch since flash_on will have been flipped)
     TIM1_SetCounter(_flash_blank_period_as_timer);
 
     _blankIndex++;
   }
   else
   {
-    /// @todo is the 5 here corresponding to LED_LINE_LENGTH?
-    if (_blankIndex < 5)
+    /// @todo is the 5 here corresponding to LED_LINE_LENGTH? or is this just a (crude) mostly-manual PWM?
+    if (_blankIndex < LED_LINE_LENGTH)
     {
+      // set update_led_blank flag so main loop will send blanks over SPI
       _update_led_blank = 1;
 
+      // Come back here (but not into the else) after flash_interval_period
       TIM1_SetCounter(_flash_interval_period_as_timer);
     }
     else
     {
+      // Disable this timer
       TIM1_Cmd(DISABLE);
 
+      // Next time timer is enabled, use flash period as counter.
       TIM1_SetCounter(_flash_period_as_timer);
 
       // enable external interrupt on sync pin (floating)
@@ -274,15 +306,19 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
       update_led = 1;
     }
   }
+
+  // toggle flag for whether to turn the flash on next time we're in here.
   _flash_on = !_flash_on;
 
-  // Cleat Interrupt Pending bit
+  // Clear Interrupt Pending bit since we handled it.
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
 
   GPIO_WriteLow(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 }
 
 int8_t _simulation_in_process = 0;
+
+#ifdef ENABLE_SIMULATION
 
 // called by hardware timer (simulated sync signal)
 INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
@@ -299,16 +335,20 @@ INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
   flash_process_start();
 }
 
+#endif // ENABLE_SIMULATION
+
 // called by change on external pin (sync signal, exposure)
 INTERRUPT_HANDLER(TLI_IRQHandler, 0)
 {
   // test point output
   GPIO_WriteReverse(PORT_TESTPOINT_7, PIN_TESTPOINT_7);
 
+#ifdef ENABLE_SIMULATION
   // simulation timer restart
   TIM2_SetCounter(0);
 
   _simulation_in_process = 0;
+#endif // ENABLE_SIMULATION
 
   // start flash by sync
   flash_process_start();
@@ -339,6 +379,7 @@ void set_interval_simulator(uint8_t simulation_period_time_ms)
 {
   disableInterrupts();
 
+#ifdef ENABLE_SIMULATION
   TIM2_Cmd(DISABLE);
 
   //    #define SIM_TIME     70 // in milliseconds
@@ -350,7 +391,7 @@ void set_interval_simulator(uint8_t simulation_period_time_ms)
   TIM2_ITConfig(TIM2_IT_UPDATE, ENABLE);
 
   TIM2_Cmd(ENABLE);
-
+#endif // ENABLE_SIMULATION
   enableInterrupts();
 }
 
@@ -359,6 +400,7 @@ void main(void)
   CLK_DeInit();
   CLK_HSICmd(ENABLE); // Internal 16 MHz clock enable
   CLK_SYSCLKConfig(CLK_PRESCALER_HSIDIV1);
+  /// switch clock source to high speed external
   CLK->SWR = 0xB4;
   CLK_CCOCmd(ENABLE);
 
@@ -368,8 +410,8 @@ void main(void)
   GPIO_Init(PORT_LATCH, PIN_LATCH, GPIO_MODE_OUT_PP_LOW_SLOW);
   GPIO_Init(PORT_N_OE, PIN_N_OE, GPIO_MODE_OUT_PP_HIGH_SLOW);
   GPIO_Init(GPIOC, GPIO_PIN_7, GPIO_MODE_OUT_PP_HIGH_SLOW); // "DATA1" on HDK 1.2 schematics
-  // GPIO_Init(GPIOC,GPIO_PIN_6,GPIO_MODE_OUT_PP_LOW_SLOW); // "DATA0"  on HDK
-  // 1.2 schematics
+  // GPIO_Init(GPIOC,GPIO_PIN_6,GPIO_MODE_OUT_PP_LOW_SLOW); // "DATA0" on HDK
+  // 1.2 schematics - but shares a pin with SDO
 
   // SPI_DeInit();
   SPI_Init(SPI_FIRSTBIT_MSB, SPI_BAUDRATEPRESCALER_2, SPI_MODE_MASTER, SPI_CLOCKPOLARITY_LOW, SPI_CLOCKPHASE_1EDGE,
