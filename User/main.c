@@ -79,8 +79,8 @@ uint8_t index_16 = 15;
 #define MAX_INTERVAL_PERIOD_ADJUSTMENT 15
 
 uint16_t _flash_blank_period    = 25;  // max 2000
-uint16_t _flash_interval_period = 125; // max 2000
-uint16_t _flash_period          = 400; // max 2000
+uint16_t _flash_interval_period = 100; // max 2000
+uint16_t _flash_period          = 300; // max 2000
 
 /// @}
 
