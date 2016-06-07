@@ -193,14 +193,16 @@ uint16_t _flash_blank_period_as_timer;
 uint16_t _flash_interval_period_as_timer;
 uint16_t _flash_period_as_timer;
 
-/// Set time from "start" or "sync signal" starting flash process to LEDs initially on.
+/// Set duration (starting from "start" or "sync signal" starting flash process) of initial (pattern-based) LED flash
+/// pulse. Essentially, the "bright" pulse duration.
 void set_flash_period(uint16_t period)
 {
   _flash_period          = period;
   _flash_period_as_timer = MAX_FLASH_PERIOD - (_flash_period - MAX_FLASH_PERIOD_ADJUSTMENT);
 }
 
-/// Set time from LEDs on to LEDs off between a pair of blanks.
+/// Set time from LEDs on to LEDs off between a pair of blanks. This is for the "blank pattern" which has all but one
+/// byte of LEDs off. Essentially, this is the "dim" duration.
 void set_blank_period(uint16_t period)
 {
   _flash_blank_period          = period;
