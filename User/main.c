@@ -164,7 +164,6 @@ typedef enum {
 State_t _procState = STATE_PROCESS_AWAITING_START;
 
 uint8_t _subState   = 0;
-uint8_t _blankIndex = 0;
 
 static void Send_blanks_spi_data()
 {
@@ -175,11 +174,10 @@ static void Send_blanks_spi_data()
 
   for (int i = 0; i < LED_LINE_LENGTH; i++)
   {
-    if (i == _blankIndex)
+    if (i == _subState)
     {
       /// @todo For one "blank" interval per process, each LED is illuminated,
-      /// to provide "dim" - is this correct
-      /// understanding?
+      /// to provide "dim" - is this correct understanding?
       SPI_SendByte((uint8_t)0xFF);
       SPI_SendByte((uint8_t)0xFF);
     }
@@ -241,7 +239,6 @@ static inline void actuallyStartFlashProcess()
 
   // start blank sequence
   _subState   = 0;
-  _blankIndex = 0;
   _procState  = STATE_PATTERN_ON;
 }
 
@@ -301,6 +298,7 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
   // Disable this timer to avoid counting while we set it.
   // TIM1_Cmd(DISABLE);
 
+  uint8_t nextSubState = _subState;
   switch (_procState)
   {
 #if defined(SYNC_DELAY_TOTAL_US) && defined(SYNC_DELAY_TIMER)
@@ -309,15 +307,15 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
     break;
 #endif // defined(SYNC_DELAY_TOTAL_US) && defined(SYNC_DELAY_TIMER)
   case STATE_DIM_PULSE_ON:
-    /// If starting from a dim state, we increment the blank index first.
-    _blankIndex = _subState + 1;
+    /// If starting from a dim state, we increment the sub state first.
+    nextSubState++;
   /// then fall through to turn off the flash, prepare for upload, etc.
   case STATE_PATTERN_ON:
     // turn off flash
     GPIO_WriteHigh(PORT_N_OE, PIN_N_OE);
-    if (_blankIndex < LED_LINE_LENGTH)
+    if (nextSubState < LED_LINE_LENGTH)
     {
-      _subState  = _blankIndex;
+      _subState  = nextSubState;
       _procState = STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD;
       TIM1_SetCounter(_flash_interval_period_as_timer);
     }
@@ -334,6 +332,7 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
 
       // allow new pattern to be written to LEDs
       _procState = STATE_AWAITING_PATTERN;
+      _subState = 0;
     }
     break;
   case STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD:
