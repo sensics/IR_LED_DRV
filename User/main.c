@@ -502,8 +502,13 @@ void main(void)
 
   // Init external IRQ
   GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
+#ifdef TRIGGER_ON_RISE
+  EXTI_SetExtIntSensitivity(EXTI_CAMERA_SYNC, EXTI_SENSITIVITY_RISE_ONLY);
+  EXTI_SetTLISensitivity(EXTI_TLISENSITIVITY_RISE_ONLY);
+#else
   EXTI_SetExtIntSensitivity(EXTI_CAMERA_SYNC, EXTI_SENSITIVITY_FALL_ONLY);
   EXTI_SetTLISensitivity(EXTI_TLISENSITIVITY_FALL_ONLY);
+#endif
 
   // timer initialization (simulation timer)
   TIM1_DeInit();

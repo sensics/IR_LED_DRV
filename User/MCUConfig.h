@@ -33,6 +33,8 @@
 /// but may vary between units?
 #define SYNC_LOW_DURATION 233
 
+#define TRIGGER_ON_RISE
+
 /// Delay (msec) at the beginning of of the flash process
 //#define SYNC_DELAY_MS 0
 /// Delay (usec, <1000) at the beginning of of the flash process
