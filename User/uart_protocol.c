@@ -26,6 +26,9 @@
 
 #ifdef ENABLE_UART
 
+#define ARRAY_ATTRIBUTE NEAR
+typedef uint8_t const ARRAY_ATTRIBUTE * ConstCharPtr;
+
 enum
 {
   UART_COMMAND_NONE       = 0,
@@ -74,7 +77,7 @@ struct UART_COMMAND
 
 #define UART_MAX_LINE_LENGTH 32
 // UART_COMMAND _protocol_data = {0};
-uint8_t _protocol_line[UART_MAX_LINE_LENGTH];
+ARRAY_ATTRIBUTE uint8_t _protocol_line[UART_MAX_LINE_LENGTH];
 uint8_t _protocol_length = 0;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +86,7 @@ uint8_t _protocol_length = 0;
 
 #define UART_MAX_WRITE_LENGTH 256
 #define UART_MAX_WRITE_LENGTH_MASK (UART_MAX_WRITE_LENGTH - 1)
-typedef struct UART_WRITE_BUFFER_
+typedef ARRAY_ATTRIBUTE struct UART_WRITE_BUFFER_
 {
   uint8_t buffer[UART_MAX_WRITE_LENGTH];
   uint8_t count;
@@ -277,7 +280,7 @@ uint8_t hex_to_int(uint8_t ch)
 #define PROTO_MAX_HEX_DIGIT_VAL 0x0f
 
 /// Parses two hex digits from a string
-static bool parseHexUint8(const uint8_t *str, uint8_t *out)
+static bool parseHexUint8(ConstCharPtr str, uint8_t *out)
 {
   if (!out || !str)
   {
@@ -295,7 +298,7 @@ static bool parseHexUint8(const uint8_t *str, uint8_t *out)
 }
 
 /// Parses four hex digits from a string
-static bool parseHexUint16(const uint8_t *str, uint16_t *out)
+static bool parseHexUint16(ConstCharPtr str, uint16_t *out)
 {
   if (!out || !str)
   {
