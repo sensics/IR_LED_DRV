@@ -88,7 +88,7 @@ static void Delay(uint16_t n)
 /// while (n--) {}
 #if defined(__ICCSTM8__)
   // this loop is ldw, decw, tnzw, jrne on IAR - so 5 (5.5?) cycles.
-#define USEC_TO_TICKS(USEC) (((MCU_CLOCK * USEC / 1000000UL) - 5) / 5)
+#define USEC_TO_TICKS(USEC) (((unsigned short)((MCU_CLOCK * (unsigned long)USEC) / 1000000UL) - 5) / 5)
 #else
 #error unported to this compiler
 #endif
