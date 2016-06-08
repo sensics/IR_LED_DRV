@@ -544,9 +544,11 @@ void main(void)
       break;
     case STATE_AWAITING_PATTERN:
       // Move to the next value in the patterns
+#ifdef ENABLE_SIMULATION
       if (_simulation_in_process)
         Send_blanks_spi_data();
       else
+#endif
         Send_array_spi_data(); // Serialize 80 (96) bit for IR LED's drivers
 
       // this is effectively index_16 = (index_16 + 1) % PATTERN_COUNT
