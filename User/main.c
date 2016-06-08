@@ -129,8 +129,12 @@ void Send_array_spi_data()
 
   uint8_t *ptr = ir_led_driver_buffer[index_16];
   uint8_t k    = LED_LINE_LENGTH * 2;
-  while (k--)
-    SPI_SendByte(*ptr++);
+  while (k)
+  {
+    k--;
+    SPI_SendByte(*ptr);
+    ptr++;
+  }
 
   Delay(1);
   GPIO_WriteHigh(PORT_LATCH, PIN_LATCH);
