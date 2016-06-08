@@ -281,7 +281,7 @@ void flash_process_start()
 // P       ___________________-___
 
 // called by hardware timer (process timer)
-INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
+INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
 {
   GPIO_WriteHigh(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 
@@ -358,7 +358,7 @@ uint8_t _simulation_period = SIMULATION_PERIOD;
 
 static int8_t _simulation_in_process = 0;
 // called by hardware timer (simulated sync signal)
-INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
+INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, ITC_IRQ_TIM2_OVF)
 {
   // test point output
   GPIO_WriteReverse(PORT_TESTPOINT_8, PIN_TESTPOINT_8);
@@ -379,7 +379,7 @@ uint8_t gotSync = 0;
 #endif
 
 // called by change on external pin (sync signal, exposure)
-INTERRUPT_HANDLER(TLI_IRQHandler, 0)
+INTERRUPT_HANDLER(TLI_IRQHandler, ITC_IRQ_TLI)
 {
   // test point output
   GPIO_WriteReverse(PORT_TESTPOINT_7, PIN_TESTPOINT_7);
