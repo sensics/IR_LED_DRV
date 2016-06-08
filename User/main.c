@@ -26,9 +26,18 @@
 /* Standard includes */
 #include "intrinsics.h" //__enable_interrupt ().
 
-#if 0
-#define BIT_CRCEN (1 << 5)
-#define BIT_CRCNEXT (1 << 4)
+/// Warnings related to dev and production.
+#ifdef ENABLE_DEV
+#warning "Development build!"
+#else
+// This should be a production build.
+#ifdef SYNC_INTERVAL
+#error "SYNC_INTERVAL cannot be defined in a production build!"
+#endif
+/// @todo is this the policy we want?
+#ifndef ENABLE_SIMULATION
+#error "ENABLE_SIMULATION must be defined in a production build!"
+#endif
 #endif
 
 #define MCU_CLOCK 16000000
@@ -87,12 +96,11 @@ static void Delay(uint16_t n)
 /// Based on how long the following loop is for each compiler:
 /// while (n--) {}
 #if defined(__ICCSTM8__)
-  // this loop is ldw, decw, tnzw, jrne on IAR - so 5 (5.5?) cycles.
+// this loop is ldw, decw, tnzw, jrne on IAR - so 5 (5.5?) cycles.
 #define USEC_TO_TICKS(USEC) (((unsigned short)((MCU_CLOCK * (unsigned long)USEC) / 1000000UL) - 5) / 5)
 #else
 #error unported to this compiler
 #endif
-
 
 static inline void delay_ticks(unsigned short ticks)
 {
@@ -100,7 +108,10 @@ static inline void delay_ticks(unsigned short ticks)
   {
   }
 }
-
+#ifdef __ICCSTM8__
+// suppress "never referenced" diagnostic for these delay functions - they get used depending on the config.
+#pragma diag_suppress=Pe177
+#endif // __ICCSTM8__
 static void delay_us(unsigned short usec) { delay_ticks(USEC_TO_TICKS(usec)); }
 static void delay_ms(unsigned short msec)
 {
@@ -109,6 +120,10 @@ static void delay_ms(unsigned short msec)
     delay_ticks(USEC_TO_TICKS(1000));
   } while (--msec);
 }
+#ifdef __ICCSTM8__
+// restore diagnostic state
+#pragma diag_default=Pe177
+#endif // __ICCSTM8__
 
 static inline void SPI_WaitForTransmissionToComplete()
 {

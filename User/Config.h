@@ -42,6 +42,7 @@
 
 // Remove embedded-only keywords
 #define TINY
+#define NEAR
 #define EEPROM
 
 #endif
