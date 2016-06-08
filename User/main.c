@@ -110,7 +110,7 @@ static inline void delay_ticks(unsigned short ticks)
 }
 #ifdef __ICCSTM8__
 // suppress "never referenced" diagnostic for these delay functions - they get used depending on the config.
-#pragma diag_suppress=Pe177
+#pragma diag_suppress = Pe177
 #endif // __ICCSTM8__
 static void delay_us(unsigned short usec) { delay_ticks(USEC_TO_TICKS(usec)); }
 static void delay_ms(unsigned short msec)
@@ -122,7 +122,7 @@ static void delay_ms(unsigned short msec)
 }
 #ifdef __ICCSTM8__
 // restore diagnostic state
-#pragma diag_default=Pe177
+#pragma diag_default = Pe177
 #endif // __ICCSTM8__
 
 static inline void SPI_WaitForTransmissionToComplete()

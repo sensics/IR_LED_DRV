@@ -27,7 +27,7 @@
 #ifdef ENABLE_UART
 
 #define ARRAY_ATTRIBUTE NEAR
-typedef uint8_t const ARRAY_ATTRIBUTE * ConstCharPtr;
+typedef uint8_t const ARRAY_ATTRIBUTE *ConstCharPtr;
 
 enum
 {
@@ -211,17 +211,20 @@ void protocol_put_input_byte(uint8_t ch)
   _protocol_length = 0;
 }
 
-static void protocol_put_hex_nibble(uint8_t nibble) {
+static void protocol_put_hex_nibble(uint8_t nibble)
+{
   nibble &= 0x0F;
-  protocol_put_output_byte(nibble < 0x0A ? ('0' + nibble) : ('A' - 0x0A + nibble) );
+  protocol_put_output_byte(nibble < 0x0A ? ('0' + nibble) : ('A' - 0x0A + nibble));
 }
 
-static void protocol_put_hex_uint8(uint8_t val) {
+static void protocol_put_hex_uint8(uint8_t val)
+{
   protocol_put_hex_nibble(val >> 4);
   protocol_put_hex_nibble(val);
 }
 
-static void protocol_put_hex_uint16(uint16_t val) {
+static void protocol_put_hex_uint16(uint16_t val)
+{
   protocol_put_hex_nibble((uint8_t)(val >> 12));
   protocol_put_hex_nibble((uint8_t)(val >> 8));
   protocol_put_hex_nibble((uint8_t)(val >> 4));
