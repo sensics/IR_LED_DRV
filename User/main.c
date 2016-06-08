@@ -126,8 +126,8 @@ void Send_array_spi_data()
 {
   GPIO_WriteLow(PORT_LATCH, PIN_LATCH); // Prepare driver latch enable for the next data latch
 
-  SPI_SendByte(0); // for 96 bit EVB
-  SPI_SendByte(0); // for 96 bit EVB
+  SPI_SendByte((uint8_t)0x00); // for 96 bit EVB
+  SPI_SendByte((uint8_t)0x00); // for 96 bit EVB
 
   uint8_t *ptr = ir_led_driver_buffer[index_16];
   uint8_t k    = DRIVER_BUFFER_LENGTH;
@@ -170,8 +170,8 @@ static void Send_blanks_spi_data()
 {
   GPIO_WriteLow(PORT_LATCH, PIN_LATCH); // Prepare driver latch enable for the next data latch
 
-  SPI_SendByte(0); // for 96 bit EVB
-  SPI_SendByte(0); // for 96 bit EVB
+  SPI_SendByte((uint8_t)0x00); // for 96 bit EVB
+  SPI_SendByte((uint8_t)0x00); // for 96 bit EVB
 
   for (int i = 0; i < LED_LINE_LENGTH; i++)
   {
@@ -180,13 +180,13 @@ static void Send_blanks_spi_data()
       /// @todo For one "blank" interval per process, each LED is illuminated,
       /// to provide "dim" - is this correct
       /// understanding?
-      SPI_SendByte(0xFF);
-      SPI_SendByte(0xFF);
+      SPI_SendByte((uint8_t)0xFF);
+      SPI_SendByte((uint8_t)0xFF);
     }
     else
     {
-      SPI_SendByte(0);
-      SPI_SendByte(0);
+      SPI_SendByte((uint8_t)0x00);
+      SPI_SendByte((uint8_t)0x00);
     }
   }
 
