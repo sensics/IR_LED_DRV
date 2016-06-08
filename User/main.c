@@ -17,6 +17,7 @@
 /* Internal Includes */
 #include "array_init.h"
 #include "uart_protocol.h"
+#include "MCUConfig.h"
 
 /* Library/third-party includes */
 #include "stm8s.h"
@@ -54,35 +55,44 @@
 
 #define MCU_CLOCK 16000000
 
-/// Delay at the beginning of of the flash process
-//#define SYNC_DELAY_US 4500
-#define SYNC_DELAY_MS 5
-
-#define SYNC_INTERVAL 3
-
-#ifndef SYNC_INTERVAL
-/// Can't have SYNC_INTERVAL and the SIMULATION enabled at once.
-#define ENABLE_SIMULATION
-#endif
-
 uint8_t index_16 = 15;
 
 /// @name Timer 1 values
-/// @brief Units are microseconds. Total time for a flash process, roughly _flash_period + 5 * _flash_blank_period + 5 *
+/// @brief Units are microseconds. Total time for a flash process, roughly
+/// _flash_period + 5 * _flash_blank_period + 5 *
 /// _flash_interval_period
 /// @{
 #define MAX_FLASH_PERIOD 2000
 
-/// Offset taken (reducing timer duration) to account for computational overhead (?) when setting flash period
+/// Offset taken (reducing timer duration) to account for computational overhead
+/// (?) when setting flash period
 #define MAX_FLASH_PERIOD_ADJUSTMENT 20
-/// Offset taken (reducing timer duration) to account for computational overhead (?) when setting blank period
+/// Offset taken (reducing timer duration) to account for computational overhead
+/// (?) when setting blank period
 #define MAX_BLANK_PERIOD_ADJUSTMENT 15
-/// Offset taken (reducing timer duration) to account for computational overhead (?) when setting interval period
+/// Offset taken (reducing timer duration) to account for computational overhead
+/// (?) when setting interval period
 #define MAX_INTERVAL_PERIOD_ADJUSTMENT 15
 
-uint16_t _flash_blank_period    = 25;  // max 2000
-uint16_t _flash_interval_period = 100; // max 2000
-uint16_t _flash_period          = 300; // max 2000
+#if FLASH_BRIGHT_PERIOD <= MAX_FLASH_PERIOD_ADJUSTMENT || FLASH_BRIGHT_PERIOD >= MAX_FLASH_PERIOD
+#error "FLASH_BRIGHT_PERIOD out of range!"
+#endif
+#if FLASH_INTERVAL_PERIOD <= MAX_INTERVAL_PERIOD_ADJUSTMENT || FLASH_INTERVAL_PERIOD >= MAX_FLASH_PERIOD
+#error "FLASH_INTERVAL_PERIOD out of range!"
+#endif
+#if FLASH_DIM_PERIOD <= MAX_BLANK_PERIOD_ADJUSTMENT || FLASH_DIM_PERIOD >= MAX_FLASH_PERIOD
+#error "FLASH_DIM_PERIOD out of range!"
+#endif
+
+#if defined(SYNC_DELAY_TOTAL_US) && defined(SYNC_DELAY_TIMER)
+#if SYNC_DELAY_TOTAL_US > MAX_FLASH_PERIOD
+#error "Total sync delay exceeds maximum possible for SYNC_DELAY_TIMER mode!"
+#endif
+#endif
+
+uint16_t _flash_blank_period    = FLASH_DIM_PERIOD;      // max 2000
+uint16_t _flash_interval_period = FLASH_INTERVAL_PERIOD; // max 2000
+uint16_t _flash_period          = FLASH_BRIGHT_PERIOD;   // max 2000
 
 /// @}
 
@@ -148,9 +158,11 @@ void Send_array_spi_data()
 typedef enum {
   /// Pattern shifted into LEDs, ready to display
   STATE_PROCESS_AWAITING_START,
+  STATE_IN_STARTUP_DELAY,
   /// Currently displaying LEDs as indicated by the pattern
   STATE_PATTERN_ON,
-  /// the following 3 have substates, indicated by _subState, for each of LED_LINE_LENGTH, since dim illumination
+  /// the following 3 have substates, indicated by _subState, for each of
+  /// LED_LINE_LENGTH, since dim illumination
   /// happens in byte-sized blocks.
   STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD,
   STATE_BETWEEN_PULSES_AWAITING_TIMER,
@@ -176,7 +188,8 @@ void Send_blanks_spi_data()
   {
     if (i == _blankIndex)
     {
-      /// @todo For one "blank" interval per process, each LED is illuminated, to provide "dim" - is this correct
+      /// @todo For one "blank" interval per process, each LED is illuminated,
+      /// to provide "dim" - is this correct
       /// understanding?
       SPI_SendByte(0xFF);
       SPI_SendByte(0xFF);
@@ -214,7 +227,8 @@ uint16_t _flash_blank_period_as_timer;
 uint16_t _flash_interval_period_as_timer;
 uint16_t _flash_period_as_timer;
 
-/// Set duration (starting from "start" or "sync signal" starting flash process) of initial (pattern-based) LED flash
+/// Set duration (starting from "start" or "sync signal" starting flash process)
+/// of initial (pattern-based) LED flash
 /// pulse. Essentially, the "bright" pulse duration.
 void set_flash_period(uint16_t period)
 {
@@ -222,7 +236,8 @@ void set_flash_period(uint16_t period)
   _flash_period_as_timer = MAX_FLASH_PERIOD - (_flash_period - MAX_FLASH_PERIOD_ADJUSTMENT);
 }
 
-/// Set time from LEDs on to LEDs off between a pair of blanks. This is for the "blank pattern" which has all but one
+/// Set time from LEDs on to LEDs off between a pair of blanks. This is for the
+/// "blank pattern" which has all but one
 /// byte of LEDs off. Essentially, this is the "dim" duration.
 void set_blank_period(uint16_t period)
 {
@@ -237,25 +252,10 @@ void set_interval_period(uint16_t period)
   _flash_interval_period_as_timer = MAX_FLASH_PERIOD - (_flash_interval_period - MAX_INTERVAL_PERIOD_ADJUSTMENT);
 }
 
-uint8_t _simulation_period = 70;
-uint8_t update_led         = 0;
-uint8_t _flash_on          = 0;
+uint8_t _simulation_period = SIMULATION_PERIOD;
 
-// can be called from anywhere - it just starts flash process
-void flash_process_start()
+void actuallyStartFlashProcess()
 {
-  // disable external interrupt
-  GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_NO_IT);
-
-// Wait a bit before starting the flash process to account for sync mistiming.
-
-#ifdef SYNC_DELAY_MS
-  delay_ms(SYNC_DELAY_MS);
-#endif
-#ifdef SYNC_DELAY_US
-  delay_us(SYNC_DELAY_US);
-#endif
-
   // turn-on flash
   GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
   // GPIO_WriteLow( GPIOD, PIN_TESTPOINT_10 );
@@ -275,16 +275,50 @@ void flash_process_start()
   _procState  = STATE_PATTERN_ON;
 }
 
-#if 0
-void set_flash_pulse_width_naked(uint16_t flash_time_us);
+// can be called from anywhere - it just starts flash process
+void flash_process_start()
+{
+  // disable external interrupt
+  GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_NO_IT);
+
+// Wait a bit before starting the flash process to account for sync mistiming.
+
+#ifdef SYNC_DELAY_TOTAL_US
+#ifdef SYNC_DELAY_TIMER
+  _procState = STATE_IN_STARTUP_DELAY;
+  // Set timer for delay duration.
+  TIM1_SetCounter(MAX_FLASH_PERIOD - SYNC_DELAY_TOTAL_US);
+
+  // start process timer
+  TIM1_Cmd(ENABLE);
+
+#else // SYNC_DELAY_TIMER ^ / v sync delay via loops
+
+#ifdef SYNC_DELAY_MS
+  delay_ms(SYNC_DELAY_MS);
+#endif // SYNC_DELAY_MS
+
+#ifdef SYNC_DELAY_US
+  delay_us(SYNC_DELAY_US);
+#endif // SYNC_DELAY_US
+
+  // Proceed directly to flash process after delay loops.
+  actuallyStartFlashProcess();
+
+#endif // SYNC_DELAY_TIMER
+
+#else // SYNC_DELAY_TOTAL_US ^ / v no sync delay.
+
+  actuallyStartFlashProcess();
+
 #endif
+}
 
 // INT     -______________________
 // FLASH   _---_--_--_--_--_--____
 // B       ____-__-__-__-__-______
 // P       ___________________-___
 
-uint8_t _update_led_blank = 0;
 // called by hardware timer (process timer)
 INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
 {
@@ -293,10 +327,20 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
   // test pulse on T9
   GPIO_WriteLow(PORT_TESTPOINT_9, PIN_TESTPOINT_9);
 
+  // Disable this timer to avoid counting while we set it.
+  //TIM1_Cmd(DISABLE);
+
   switch (_procState)
   {
+#if defined(SYNC_DELAY_TOTAL_US) && defined(SYNC_DELAY_TIMER)
+  case STATE_IN_STARTUP_DELAY:
+    actuallyStartFlashProcess();
+    break;
+#endif // defined(SYNC_DELAY_TOTAL_US) && defined(SYNC_DELAY_TIMER)
   case STATE_DIM_PULSE_ON:
+    /// If starting from a dim state, we increment the blank index first.
     _blankIndex = _subState + 1;
+  /// then fall through to turn off the flash, prepare for upload, etc.
   case STATE_PATTERN_ON:
     // turn off flash
     GPIO_WriteHigh(PORT_N_OE, PIN_N_OE);
@@ -322,7 +366,10 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
     }
     break;
   case STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD:
-  // shouldn't get here!
+
+    // shouldn't get here!
+    halt();
+    break;
   case STATE_BETWEEN_PULSES_AWAITING_TIMER:
     // turn on flash
     GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
@@ -333,6 +380,13 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
 
   // Clear Interrupt Pending bit since we handled it.
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
+#if 0
+  if (_procState != STATE_AWAITING_PATTERN)
+  {
+    // If we haven't finished the process, re-start the timer.
+    TIM1_Cmd(FunctionalState::ENABLE);
+  }
+#endif
 
   GPIO_WriteLow(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 }

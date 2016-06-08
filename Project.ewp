@@ -1708,6 +1708,9 @@
       <name>$PROJ_DIR$\User\main.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\User\MCUConfig.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\User\uart_protocol.c</name>
     </file>
     <file>
