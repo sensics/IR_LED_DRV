@@ -77,23 +77,22 @@ uint16_t _flash_period          = FLASH_BRIGHT_PERIOD;   // max 2000
 
 /// @}
 
-void Delay(uint16_t n)
+static void Delay(uint16_t n)
 {
   while (n--)
     ;
 }
 
-static inline unsigned short usec_to_ticks(unsigned short usec)
-{
-// Based on how long the following loop is for each compiler:
-// while (n--) {}
+/// USEC_TO_TICKS
+/// Based on how long the following loop is for each compiler:
+/// while (n--) {}
 #if defined(__ICCSTM8__)
   // this loop is ldw, decw, tnzw, jrne on IAR - so 5 (5.5?) cycles.
-  return ((MCU_CLOCK * usec / 1000000UL) - 5) / 5;
+#define USEC_TO_TICKS(USEC) (((MCU_CLOCK * USEC / 1000000UL) - 5) / 5)
 #else
 #error unported to this compiler
 #endif
-}
+
 
 static inline void delay_ticks(unsigned short ticks)
 {
@@ -102,13 +101,12 @@ static inline void delay_ticks(unsigned short ticks)
   }
 }
 
-static void delay_us(unsigned short usec) { delay_ticks(usec_to_ticks(usec)); }
+static void delay_us(unsigned short usec) { delay_ticks(USEC_TO_TICKS(usec)); }
 static void delay_ms(unsigned short msec)
 {
-  unsigned short ticks_per_ms = usec_to_ticks(1000);
   do
   {
-    delay_ticks(ticks_per_ms);
+    delay_ticks(USEC_TO_TICKS(1000));
   } while (--msec);
 }
 
@@ -132,7 +130,7 @@ void Send_array_spi_data()
   SPI_SendByte(0); // for 96 bit EVB
 
   uint8_t *ptr = ir_led_driver_buffer[index_16];
-  uint8_t k    = LED_LINE_LENGTH * 2;
+  uint8_t k    = DRIVER_BUFFER_LENGTH;
   while (k)
   {
     k--;
@@ -165,10 +163,10 @@ typedef enum {
 
 State_t _procState = STATE_PROCESS_AWAITING_START;
 
-int _subState   = 0;
-int _blankIndex = 0;
+uint8_t _subState   = 0;
+uint8_t _blankIndex = 0;
 
-void Send_blanks_spi_data()
+static void Send_blanks_spi_data()
 {
   GPIO_WriteLow(PORT_LATCH, PIN_LATCH); // Prepare driver latch enable for the next data latch
 
@@ -226,7 +224,7 @@ void set_interval_period(uint16_t period)
   _flash_interval_period_as_timer = MAX_FLASH_PERIOD - (_flash_interval_period - MAX_INTERVAL_PERIOD_ADJUSTMENT);
 }
 
-void actuallyStartFlashProcess()
+static inline void actuallyStartFlashProcess()
 {
   // turn-on flash
   GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
@@ -248,7 +246,7 @@ void actuallyStartFlashProcess()
 }
 
 // can be called from anywhere - it just starts flash process
-void flash_process_start()
+static void flash_process_start()
 {
   // disable external interrupt
   GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_NO_IT);
@@ -294,6 +292,7 @@ void flash_process_start()
 // called by hardware timer (process timer)
 INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
 {
+
   GPIO_WriteHigh(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 
   // test pulse on T9

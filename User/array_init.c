@@ -72,7 +72,7 @@ EEPROM uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
 
 TINY uint8_t pattern_array[PATTERN_COUNT][LED_LINE_LENGTH];
 
-TINY uint8_t ir_led_driver_buffer[PATTERN_COUNT][LED_LINE_LENGTH * 2];
+TINY uint8_t ir_led_driver_buffer[PATTERN_COUNT][DRIVER_BUFFER_LENGTH];
 
 void line_array_init(uint8_t index, uint8_t *value)
 {
