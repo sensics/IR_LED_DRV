@@ -393,7 +393,7 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
   if (_procState != STATE_AWAITING_PATTERN)
   {
     // If we haven't finished the process, re-start the timer.
-    TIM1_Cmd(FunctionalState::ENABLE);
+    TIM1_Cmd(ENABLE);
   }
 #endif
 
