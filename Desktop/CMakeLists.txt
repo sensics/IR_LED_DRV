@@ -17,3 +17,8 @@ add_executable(DumpPatterns
     "${USER_DIR}/array_init.c"
     "${USER_DIR}/array_init.h")
 target_link_libraries(DumpPatterns PRIVATE JsonCpp::JsonCpp)
+
+add_executable(DumpSPI
+    DumpSPI.cpp
+    "${USER_DIR}/array_init.c"
+    "${USER_DIR}/array_init.h")

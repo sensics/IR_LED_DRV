@@ -74,6 +74,9 @@ uint8_t index_16 = 15;
 /// when setting interval period, to achieve correct duration validated by logic analyzer
 #define MAX_INTERVAL_PERIOD_ADJUSTMENT 14
 
+/// Additional overhead of the startup delay timer measured to be roughly 13.78usec
+#define SYNC_TIMER_DELAY_ADJUSTMENT 14
+
 #if FLASH_BRIGHT_PERIOD <= MAX_FLASH_PERIOD_ADJUSTMENT || FLASH_BRIGHT_PERIOD >= MAX_FLASH_PERIOD
 #error "FLASH_BRIGHT_PERIOD out of range!"
 #endif
@@ -287,7 +290,7 @@ void flash_process_start()
 #ifdef SYNC_DELAY_TIMER
   _procState = STATE_IN_STARTUP_DELAY;
   // Set timer for delay duration.
-  TIM1_SetCounter(MAX_FLASH_PERIOD - SYNC_DELAY_TOTAL_US);
+  TIM1_SetCounter(MAX_FLASH_PERIOD - (SYNC_DELAY_TOTAL_US - SYNC_TIMER_DELAY_ADJUSTMENT));
 
   // start process timer
   TIM1_Cmd(ENABLE);
@@ -328,7 +331,7 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
   GPIO_WriteLow(PORT_TESTPOINT_9, PIN_TESTPOINT_9);
 
   // Disable this timer to avoid counting while we set it.
-  //TIM1_Cmd(DISABLE);
+  // TIM1_Cmd(DISABLE);
 
   switch (_procState)
   {
