@@ -30,7 +30,7 @@
 
 /// Time (usec) it takes from the sync signal going low, to us driving nOE low
 /// (with delay off) - measured with logic analyzer
-#define SYNC_INTERRUPT_OVERHEAD 23
+#define SYNC_INTERRUPT_OVERHEAD 11
 
 /// Time (usec) that the sync signal stays low - measured with logic analyzer,
 /// but may vary between units?
