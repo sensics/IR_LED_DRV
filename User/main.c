@@ -351,9 +351,14 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
     }
     break;
   case STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD:
-
     // shouldn't get here!
+    // it means we couldn't get around to uploading the pattern before the timer went off
+#ifdef ENABLE_DEV
     halt();
+#else
+    // Wait some more.
+    TIM1_SetCounter(_flash_interval_period_as_timer);
+#endif
     break;
   case STATE_BETWEEN_PULSES_AWAITING_TIMER:
     // turn on flash
