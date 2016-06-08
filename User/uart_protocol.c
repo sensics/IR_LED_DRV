@@ -227,6 +227,23 @@ void protocol_put_input_byte(uint8_t ch)
   _protocol_length = 0;
 }
 
+static void protocol_put_hex_nibble(uint8_t nibble) {
+  nibble &= 0x0F;
+  protocol_put_output_byte(nibble < 0x0A ? ('0' + nibble) : ('A' - 0x0A + nibble) );
+}
+
+static void protocol_put_hex_uint8(uint8_t val) {
+  protocol_put_hex_nibble(val >> 4);
+  protocol_put_hex_nibble(val);
+}
+
+static void protocol_put_hex_uint16(uint16_t val) {
+  protocol_put_hex_nibble((uint8_t)(val >> 12));
+  protocol_put_hex_nibble((uint8_t)(val >> 8));
+  protocol_put_hex_nibble((uint8_t)(val >> 4));
+  protocol_put_hex_nibble((uint8_t)(val));
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,8 +280,6 @@ void protocol_output_string(uint8_t *info, uint8_t info_length)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-CONST uint8_t _hex_table[] = "0123456789ABCDEF";
 
 uint8_t hex_to_int(uint8_t ch)
 {
@@ -378,10 +393,7 @@ void protocol_parse_flash_read()
   protocol_put_output_byte(UART_COMMAND_FLASH);
   protocol_put_output_byte(UART_MODE_READ);
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
-  protocol_put_output_byte(_hex_table[(_flash_period >> 12) & 0x0F]);
-  protocol_put_output_byte(_hex_table[(_flash_period >> 8) & 0x0F]);
-  protocol_put_output_byte(_hex_table[(_flash_period >> 4) & 0x0F]);
-  protocol_put_output_byte(_hex_table[(_flash_period >> 0) & 0x0F]);
+  protocol_put_hex_uint16(_flash_period);
   protocol_put_output_byte(UART_CHARACTER_EOL);
   protocol_put_output_byte(UART_CHARACTER_NEWLINE);
 }
@@ -424,10 +436,7 @@ void protocol_parse_blank_read()
   protocol_put_output_byte(UART_COMMAND_BLANK);
   protocol_put_output_byte(UART_MODE_READ);
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
-  protocol_put_output_byte(_hex_table[(_flash_blank_period >> 12) & 0x0F]);
-  protocol_put_output_byte(_hex_table[(_flash_blank_period >> 8) & 0x0F]);
-  protocol_put_output_byte(_hex_table[(_flash_blank_period >> 4) & 0x0F]);
-  protocol_put_output_byte(_hex_table[(_flash_blank_period >> 0) & 0x0F]);
+  protocol_put_hex_uint16(_flash_blank_period);
   protocol_put_output_byte(UART_CHARACTER_EOL);
   protocol_put_output_byte(UART_CHARACTER_NEWLINE);
 }
@@ -471,10 +480,7 @@ void protocol_parse_interval_read()
   protocol_put_output_byte(UART_COMMAND_INTERVAL);
   protocol_put_output_byte(UART_MODE_READ);
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
-  protocol_put_output_byte(_hex_table[(_flash_interval_period >> 12) & 0x0F]);
-  protocol_put_output_byte(_hex_table[(_flash_interval_period >> 8) & 0x0F]);
-  protocol_put_output_byte(_hex_table[(_flash_interval_period >> 4) & 0x0F]);
-  protocol_put_output_byte(_hex_table[(_flash_interval_period >> 0) & 0x0F]);
+  protocol_put_hex_uint16(_flash_interval_period);
   protocol_put_output_byte(UART_CHARACTER_EOL);
   protocol_put_output_byte(UART_CHARACTER_NEWLINE);
 }
@@ -520,8 +526,7 @@ void protocol_parse_sim_read()
   protocol_put_output_byte(UART_COMMAND_SIMULATION);
   protocol_put_output_byte(UART_MODE_READ);
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
-  protocol_put_output_byte(_hex_table[(_simulation_period >> 4) & 0x0F]);
-  protocol_put_output_byte(_hex_table[(_simulation_period >> 0) & 0x0F]);
+  protocol_put_hex_uint8(_simulation_period);
   protocol_put_output_byte(UART_CHARACTER_EOL);
   protocol_put_output_byte(UART_CHARACTER_NEWLINE);
 }
@@ -593,12 +598,11 @@ void protocol_parse_pattern_read()
   protocol_put_output_byte(UART_COMMAND_PATTERN);
   protocol_put_output_byte(UART_MODE_READ);
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
-  protocol_put_output_byte(_hex_table[index]);
+  protocol_put_hex_nibble(index);
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
   for (uint8_t i = 0; i < LED_LINE_LENGTH; i++)
   {
-    protocol_put_output_byte(_hex_table[(pattern_array[index][i] >> 4) & 0x0F]);
-    protocol_put_output_byte(_hex_table[(pattern_array[index][i] >> 0) & 0x0F]);
+    protocol_put_hex_uint8(pattern_array[index][i]);
     protocol_put_output_byte(UART_CHARACTER_COMMA);
   }
   protocol_put_output_byte(UART_CHARACTER_EOL);
