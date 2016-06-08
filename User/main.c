@@ -464,7 +464,7 @@ void set_flash_timer_max_period(uint16_t flash_time_us)
 
   TIM1_Cmd(DISABLE);
 
-  // prescaler is set to 15, so that the counter clock frequency is 1MHz
+  // prescaler is set to 15 (+1), so that the counter clock frequency is 1MHz
   // (That is, the units are microseconds)
   TIM1_TimeBaseInit((MCU_CLOCK / 1000000) - 1, TIM1_COUNTERMODE_UP, flash_time_us, 0);
   TIM1_ClearFlag(TIM1_FLAG_UPDATE);
