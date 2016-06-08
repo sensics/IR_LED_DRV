@@ -59,22 +59,6 @@ enum
 // FR\n\r
 // PW:A:00,01,02,03,04
 
-struct UART_COMMAND
-{
-  uint8_t write_mode;
-
-  union
-  {
-    uint16_t flash_time;     // in us
-    uint8_t simulation_time; // in ms
-    struct
-    {
-      uint8_t index;
-      uint8_t pattern[LED_LINE_LENGTH];
-    };
-  };
-};
-
 #define UART_MAX_LINE_LENGTH 32
 // UART_COMMAND _protocol_data = {0};
 ARRAY_ATTRIBUTE uint8_t _protocol_line[UART_MAX_LINE_LENGTH];
@@ -286,9 +270,9 @@ uint8_t hex_to_int(uint8_t ch)
   if (ch >= '0' && ch <= '9')
     return ch - '0';
   if (ch >= 'A' && ch <= 'F')
-    return ch - 'A' + 10;
+    return ch - 'A' + 0x0a;
   if (ch >= 'a' && ch <= 'f')
-    return ch - 'a' + 10;
+    return ch - 'a' + 0x0a;
   return U8_MAX;
 }
 
