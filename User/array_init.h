@@ -26,7 +26,7 @@
 void line_array_init(uint8_t index, uint8_t *value);
 void default_array_init(void);
 
-extern TINY uint8_t ir_led_driver_buffer[PATTERN_COUNT][DRIVER_BUFFER_LENGTH];
-extern TINY uint8_t pattern_array[PATTERN_COUNT][LED_LINE_LENGTH];
+extern NEAR uint8_t ir_led_driver_buffer[PATTERN_COUNT][DRIVER_BUFFER_LENGTH];
+extern NEAR uint8_t pattern_array[PATTERN_COUNT][LED_LINE_LENGTH];
 
 #endif
