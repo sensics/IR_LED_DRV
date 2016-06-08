@@ -261,7 +261,7 @@ void protocol_output_string(uint8_t *info, uint8_t info_length)
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static CONST TINY uint8_t _hex_table[] = "0123456789ABCDEF";
+CONST uint8_t _hex_table[] = "0123456789ABCDEF";
 
 uint8_t hex_to_int(uint8_t ch)
 {
