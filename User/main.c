@@ -143,7 +143,22 @@ void Send_array_spi_data()
   GPIO_WriteHigh(PORT_LATCH, PIN_LATCH);
 }
 
+typedef enum {
+  STATE_PROCESS_AWAITING_START,
+  STATE_PATTERN_ON,
+  /// the following 3 have substates, indicated by _blankIndex, for each of LED_LINE_LENGTH, since dim illumination
+  /// happens in byte-sized blocks.
+  STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD,
+  STATE_BETWEEN_PULSES_AWAITING_TIMER,
+  STATE_DIM_PULSE_ON,
+  STATE_AWAITING_PATTERN
+} State_t;
+
+State_t _procState = STATE_PROCESS_AWAITING_START;
+
+int _subState   = 0;
 int _blankIndex = 0;
+
 void Send_blanks_spi_data()
 {
   GPIO_WriteLow(PORT_LATCH, PIN_LATCH); // Prepare driver latch enable for the next data latch
@@ -238,6 +253,7 @@ void flash_process_start()
   // turn-on flash
   GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
   // GPIO_WriteLow( GPIOD, PIN_TESTPOINT_10 );
+  _procState = STATE_PATTERN_ON;
 
   // process timer restart
   TIM1_SetCounter(_flash_period_as_timer);
@@ -249,6 +265,7 @@ void flash_process_start()
   GPIO_WriteHigh(PORT_TESTPOINT_9, PIN_TESTPOINT_9);
 
   // start blank sequence
+  _subState   = 0;
   _blankIndex = 0;
   _flash_on   = 0;
 }
@@ -268,14 +285,53 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
 {
   GPIO_WriteHigh(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 
+  // test pulse on T9
+  GPIO_WriteLow(PORT_TESTPOINT_9, PIN_TESTPOINT_9);
+
+  switch (_procState)
+  {
+  case STATE_DIM_PULSE_ON:
+    _blankIndex = _subState + 1;
+  case STATE_PATTERN_ON:
+    // turn off flash
+    GPIO_WriteHigh(PORT_N_OE, PIN_N_OE);
+    if (_blankIndex < LED_LINE_LENGTH)
+    {
+      _subState  = _blankIndex;
+      _procState = STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD;
+      TIM1_SetCounter(_flash_interval_period_as_timer);
+    }
+    else
+    {
+      // Disable this timer
+      TIM1_Cmd(DISABLE);
+
+      // Next time timer is enabled, use flash period as counter.
+      TIM1_SetCounter(_flash_period_as_timer);
+
+      // enable external interrupt on sync pin (floating)
+      GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
+
+      // allow new pattern to be written to LEDs
+      _procState = STATE_AWAITING_PATTERN;
+    }
+    break;
+  case STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD:
+  // shouldn't get here!
+  case STATE_BETWEEN_PULSES_AWAITING_TIMER:
+    // turn on flash
+    GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
+    TIM1_SetCounter(_flash_blank_period_as_timer);
+    _procState = STATE_DIM_PULSE_ON;
+    break;
+  }
+
+#if 0
   // turn on/off flash
   if (_flash_on)
     GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
   else
     GPIO_WriteHigh(PORT_N_OE, PIN_N_OE);
-
-  // test pulse on T9
-  GPIO_WriteLow(PORT_TESTPOINT_9, PIN_TESTPOINT_9);
 
   // stop timer
   if (_flash_on)
@@ -315,7 +371,7 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
 
   // toggle flag for whether to turn the flash on next time we're in here.
   _flash_on = !_flash_on;
-
+#endif
   // Clear Interrupt Pending bit since we handled it.
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
 
@@ -463,18 +519,14 @@ void main(void)
 
   while (1)
   {
-    if (_update_led_blank)
+    switch (_procState)
     {
-      _update_led_blank = 0;
-
+    case STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD:
       Send_blanks_spi_data();
-    }
-
-    if (update_led)
-    {
+      _procState = STATE_BETWEEN_PULSES_AWAITING_TIMER;
+      break;
+    case STATE_AWAITING_PATTERN:
       // Move to the next value in the patterns
-      update_led = 0;
-
       if (_simulation_in_process)
         Send_blanks_spi_data();
       else
@@ -483,6 +535,8 @@ void main(void)
       // this is effectively index_16 = (index_16 + 1) % PATTERN_COUNT
       index_16++;
       index_16 &= 0x0F;
+      _procState = STATE_PROCESS_AWAITING_START;
+      break;
     }
 
     /*
