@@ -257,11 +257,28 @@ static inline void actuallyStartFlashProcess()
   _procState = STATE_PATTERN_ON;
 }
 
+/// Requires that you've already used GPIO_Init to do the overall, full pin setup: this just flips one bit to enable the
+/// external interrupt, which is much (over 10usec) faster.
+static inline void enable_sync_interrupt()
+{
+  // Set pin's bit in CR2 register
+  PORT_CAMERA_SYNC->CR2 |= (uint8_t)PIN_CAMERA_SYNC;
+}
+
+/// Requires that you've already used GPIO_Init to do the overall, full pin setup: this just flips one bit to disable
+/// the external interrupt, which is much (over 10usec) faster.
+static inline void disable_sync_interrupt()
+{
+  // Clear pin's bit in CR2 register
+  PORT_CAMERA_SYNC->CR2 &= ~((uint8_t)PIN_CAMERA_SYNC);
+}
+
 // can be called from anywhere - it just starts flash process
 static void flash_process_start()
 {
   // disable external interrupt
-  GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_NO_IT);
+  // GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_NO_IT);
+  disable_sync_interrupt();
 
 // Wait a bit before starting the flash process to account for sync mistiming.
 
@@ -343,7 +360,8 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
       TIM1_SetCounter(_flash_period_as_timer);
 
       // enable external interrupt on sync pin (floating)
-      GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
+      // GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
+      enable_sync_interrupt();
 
       // allow new pattern to be written to LEDs
       _procState = STATE_AWAITING_PATTERN;
