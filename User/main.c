@@ -66,9 +66,9 @@ uint16_t t_light, t_dark = 0;
 uint8_t index_16 = 15;
 
 /// @name Timer 1 values
-/// @brief I believe the units are 0.05ms
+/// @brief Units are microseconds. Total time for a flash process, roughly _flash_period + 5 * _flash_blank_period + 5 *
+/// _flash_interval_period
 /// @{
-/// @brief aka 10 ms
 #define MAX_FLASH_PERIOD 2000
 
 /// Offset taken (reducing timer duration) to account for computational overhead (?) when setting flash period
@@ -366,7 +366,8 @@ void set_flash_timer_max_period(uint16_t flash_time_us)
 
   TIM1_Cmd(DISABLE);
 
-  // prescaler is set to 15: 2^15 = 32k
+  // prescaler is set to 15, so that the counter clock frequency is 1MHz
+  // (That is, the units are microseconds)
   TIM1_TimeBaseInit((MCU_CLOCK / 1000000) - 1, TIM1_COUNTERMODE_UP, flash_time_us, 0);
   TIM1_ClearFlag(TIM1_FLAG_UPDATE);
   TIM1_SetCounter(0);
