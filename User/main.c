@@ -58,11 +58,13 @@
 //#define SYNC_DELAY_US 4500
 #define SYNC_DELAY_MS 5
 
-#define ENABLE_SIMULATION
+#define SYNC_INTERVAL 3
 
-#if 0
-uint16_t t_light, t_dark = 0;
+#ifndef SYNC_INTERVAL
+/// Can't have SYNC_INTERVAL and the SIMULATION enabled at once.
+#define ENABLE_SIMULATION
 #endif
+
 uint8_t index_16 = 15;
 
 /// @name Timer 1 values
@@ -144,13 +146,17 @@ void Send_array_spi_data()
 }
 
 typedef enum {
+  /// Pattern shifted into LEDs, ready to display
   STATE_PROCESS_AWAITING_START,
+  /// Currently displaying LEDs as indicated by the pattern
   STATE_PATTERN_ON,
-  /// the following 3 have substates, indicated by _blankIndex, for each of LED_LINE_LENGTH, since dim illumination
+  /// the following 3 have substates, indicated by _subState, for each of LED_LINE_LENGTH, since dim illumination
   /// happens in byte-sized blocks.
   STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD,
   STATE_BETWEEN_PULSES_AWAITING_TIMER,
+  /// All off except a single byte of LEDs, for dim illumination
   STATE_DIM_PULSE_ON,
+  /// All dim illumination cycles completed, awaiting pattern illumination.
   STATE_AWAITING_PATTERN
 } State_t;
 
@@ -253,7 +259,6 @@ void flash_process_start()
   // turn-on flash
   GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
   // GPIO_WriteLow( GPIOD, PIN_TESTPOINT_10 );
-  _procState = STATE_PATTERN_ON;
 
   // process timer restart
   TIM1_SetCounter(_flash_period_as_timer);
@@ -267,7 +272,7 @@ void flash_process_start()
   // start blank sequence
   _subState   = 0;
   _blankIndex = 0;
-  _flash_on   = 0;
+  _procState  = STATE_PATTERN_ON;
 }
 
 #if 0
@@ -326,52 +331,6 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
     break;
   }
 
-#if 0
-  // turn on/off flash
-  if (_flash_on)
-    GPIO_WriteLow(PORT_N_OE, PIN_N_OE);
-  else
-    GPIO_WriteHigh(PORT_N_OE, PIN_N_OE);
-
-  // stop timer
-  if (_flash_on)
-  {
-    // If we just turned the flash on, come back in here after flash_blank_period.
-    // (But, we'll go to the "else" branch since flash_on will have been flipped)
-    TIM1_SetCounter(_flash_blank_period_as_timer);
-
-    _blankIndex++;
-  }
-  else
-  {
-    /// @todo is the 5 here corresponding to LED_LINE_LENGTH? or is this just a (crude) mostly-manual PWM?
-    if (_blankIndex < LED_LINE_LENGTH)
-    {
-      // set update_led_blank flag so main loop will send blanks over SPI
-      _update_led_blank = 1;
-
-      // Come back here (but not into the else) after flash_interval_period
-      TIM1_SetCounter(_flash_interval_period_as_timer);
-    }
-    else
-    {
-      // Disable this timer
-      TIM1_Cmd(DISABLE);
-
-      // Next time timer is enabled, use flash period as counter.
-      TIM1_SetCounter(_flash_period_as_timer);
-
-      // enable external interrupt on sync pin (floating)
-      GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
-
-      // allow new pattern to be written to LEDs
-      update_led = 1;
-    }
-  }
-
-  // toggle flag for whether to turn the flash on next time we're in here.
-  _flash_on = !_flash_on;
-#endif
   // Clear Interrupt Pending bit since we handled it.
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
 
@@ -399,6 +358,10 @@ INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
 
 #endif // ENABLE_SIMULATION
 
+#ifdef SYNC_INTERVAL
+uint8_t gotSync = 0;
+#endif
+
 // called by change on external pin (sync signal, exposure)
 INTERRUPT_HANDLER(TLI_IRQHandler, 0)
 {
@@ -412,8 +375,22 @@ INTERRUPT_HANDLER(TLI_IRQHandler, 0)
   _simulation_in_process = 0;
 #endif // ENABLE_SIMULATION
 
+#ifdef SYNC_INTERVAL
+  // For debugging, only start up the flash every SYNC_INTERVAL pulses
+  if (gotSync == (SYNC_INTERVAL - 1))
+  {
+    gotSync = 0;
+    // start flash by sync
+    flash_process_start();
+  }
+  else
+  {
+    gotSync++;
+  }
+#else
   // start flash by sync
   flash_process_start();
+#endif
 }
 
 void set_flash_timer_max_period(uint16_t flash_time_us)
