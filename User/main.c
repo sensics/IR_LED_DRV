@@ -304,16 +304,12 @@ static void flash_process_start()
 // called by hardware timer (process timer)
 INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
 {
-
+  // Pull test point high to signal entry into the process timer interrupt handler.
   GPIO_WriteHigh(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
-
-  // test pulse on T9
-  GPIO_WriteLow(PORT_TESTPOINT_9, PIN_TESTPOINT_9);
 
   // Disable this timer to avoid counting while we set it.
   // TIM1_Cmd(DISABLE);
 
-  uint8_t nextSubState = _subState;
   switch (_procState)
   {
 #if defined(SYNC_DELAY_TOTAL_US) && defined(SYNC_DELAY_TIMER)
@@ -321,11 +317,15 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
     actuallyStartFlashProcess();
     break;
 #endif // defined(SYNC_DELAY_TOTAL_US) && defined(SYNC_DELAY_TIMER)
-  case STATE_DIM_PULSE_ON:
-    /// If starting from a dim state, we increment the sub state first.
-    nextSubState++;
-  /// then fall through to turn off the flash, prepare for upload, etc.
   case STATE_PATTERN_ON:
+    // end test pulse on T9
+    GPIO_WriteLow(PORT_TESTPOINT_9, PIN_TESTPOINT_9);
+  /// then fall through to turn off the flash, prepare for upload, etc.
+  case STATE_DIM_PULSE_ON:
+  {
+
+    /// If starting from a dim state, we increment the sub state first.
+    uint8_t nextSubState = _procState == STATE_DIM_PULSE_ON ? _subState + 1 : _subState;
     // turn off flash
     GPIO_WriteHigh(PORT_N_OE, PIN_N_OE);
     if (nextSubState < LED_LINE_LENGTH)
@@ -349,12 +349,13 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
       _procState = STATE_AWAITING_PATTERN;
       _subState  = 0;
     }
-    break;
+  }
+  break;
   case STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD:
-    // shouldn't get here!
-    // it means we couldn't get around to uploading the pattern before the timer went off
+// shouldn't get here!
+// it means we couldn't get around to uploading the pattern before the timer went off
 #ifdef ENABLE_DEV
-    halt();
+    assert_param(_procState != STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD);
 #else
     // Wait some more.
     TIM1_SetCounter(_flash_interval_period_as_timer);
@@ -378,6 +379,7 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
   }
 #endif
 
+  // Bring test point low to signal completion of the process timer interrupt handler.
   GPIO_WriteLow(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 }
 
