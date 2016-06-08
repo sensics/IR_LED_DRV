@@ -24,6 +24,8 @@
 /* Standard includes */
 /* - none - */
 
+#ifdef ENABLE_UART
+
 enum
 {
   UART_COMMAND_NONE       = 0,
@@ -259,7 +261,7 @@ void protocol_output_string(uint8_t *info, uint8_t info_length)
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const uint8_t _hex_table[] = "0123456789ABCDEF";
+static CONST TINY uint8_t _hex_table[] = "0123456789ABCDEF";
 
 uint8_t hex_to_int(uint8_t ch)
 {
@@ -275,7 +277,7 @@ uint8_t hex_to_int(uint8_t ch)
 #define PROTO_MAX_HEX_DIGIT_VAL 0x0f
 
 /// Parses two hex digits from a string
-bool parseHexUint8(const uint8_t *str, uint8_t *out)
+static bool parseHexUint8(const uint8_t *str, uint8_t *out)
 {
   if (!out || !str)
   {
@@ -293,7 +295,7 @@ bool parseHexUint8(const uint8_t *str, uint8_t *out)
 }
 
 /// Parses four hex digits from a string
-bool parseHexUint16(const uint8_t *str, uint16_t *out)
+static bool parseHexUint16(const uint8_t *str, uint16_t *out)
 {
   if (!out || !str)
   {
@@ -327,7 +329,7 @@ void set_interval_period(uint16_t period);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void set_flash_pulse_width(uint16_t flash_time_us);
+// void set_flash_pulse_width(uint16_t flash_time_us);
 void set_interval_simulator(uint8_t simulation_period_time_ms);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -354,7 +356,8 @@ void protocol_parse_flash_write()
   }
 
   //_flash_period = value;
-  //_flash_period_as_timer          = MAX_FLASH_PERIOD - _flash_period - MAX_FLASH_PERIOD_ADJUSTMENT;
+  //_flash_period_as_timer          = MAX_FLASH_PERIOD - _flash_period -
+  // MAX_FLASH_PERIOD_ADJUSTMENT;
   set_flash_period(value);
   //  set_flash_pulse_width(_flash_period);
 
@@ -625,3 +628,4 @@ void protocol_help()
   protocol_put_output_byte(UART_CHARACTER_EOL);
   protocol_put_output_byte(UART_CHARACTER_NEWLINE);
 }
+#endif

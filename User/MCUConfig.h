@@ -22,11 +22,15 @@
 /// running patterns even when no sync arrives.
 #define ENABLE_SIMULATION
 
-/// Time (usec) it takes from the sync signal going low, to us driving nOE low (with delay off) - measured with logic
-/// analyzer
+/// enable the serial console
+#define ENABLE_UART
+
+/// Time (usec) it takes from the sync signal going low, to us driving nOE low
+/// (with delay off) - measured with logic analyzer
 #define SYNC_INTERRUPT_OVERHEAD 23
 
-/// Time (usec) that the sync signal stays low - measured with logic analyzer, but may vary between units?
+/// Time (usec) that the sync signal stays low - measured with logic analyzer,
+/// but may vary between units?
 #define SYNC_LOW_DURATION 233
 
 /// Delay (msec) at the beginning of of the flash process
@@ -36,7 +40,8 @@
 
 #define SYNC_DELAY_US (SYNC_LOW_DURATION - SYNC_INTERRUPT_OVERHEAD)
 
-// Use a timer, rather than a delay loop, to provide sync delay. Recommended, but limits total delay to 2000ms.
+// Use a timer, rather than a delay loop, to provide sync delay. Recommended,
+// but limits total delay to 2000ms.
 #define SYNC_DELAY_TIMER
 
 #if defined(SYNC_DELAY_MS) && defined(SYNC_DELAY_US)

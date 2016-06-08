@@ -186,24 +186,6 @@ void Send_blanks_spi_data()
   GPIO_WriteHigh(PORT_LATCH, PIN_LATCH);
 }
 
-//  Send a message to the debug port (UART1).
-//
-void Printf(char *message)
-{
-  char *ch = message;
-  while (*ch)
-  {
-    UART1->DR = (u8)(*ch);
-    while ((UART1->SR & (u8)UART1_FLAG_TXE) == RESET)
-      ;
-    ch++;
-  }
-}
-
-#if 0
-void set_flash_next_interrupt_time(uint16_t flash_time_us);
-#endif
-
 uint16_t _flash_blank_period_as_timer;
 uint16_t _flash_interval_period_as_timer;
 uint16_t _flash_period_as_timer;
@@ -232,8 +214,6 @@ void set_interval_period(uint16_t period)
   _flash_interval_period          = period;
   _flash_interval_period_as_timer = MAX_FLASH_PERIOD - (_flash_interval_period - MAX_INTERVAL_PERIOD_ADJUSTMENT);
 }
-
-uint8_t _simulation_period = SIMULATION_PERIOD;
 
 void actuallyStartFlashProcess()
 {
@@ -372,10 +352,11 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
   GPIO_WriteLow(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 }
 
-int8_t _simulation_in_process = 0;
+uint8_t _simulation_period = SIMULATION_PERIOD;
 
 #ifdef ENABLE_SIMULATION
 
+static int8_t _simulation_in_process = 0;
 // called by hardware timer (simulated sync signal)
 INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
 {
@@ -452,9 +433,9 @@ void set_flash_timer_max_period(uint16_t flash_time_us)
 
 void set_interval_simulator(uint8_t simulation_period_time_ms)
 {
+#ifdef ENABLE_SIMULATION
   disableInterrupts();
 
-#ifdef ENABLE_SIMULATION
   TIM2_Cmd(DISABLE);
 
   //    #define SIM_TIME     70 // in milliseconds
@@ -466,8 +447,8 @@ void set_interval_simulator(uint8_t simulation_period_time_ms)
   TIM2_ITConfig(TIM2_IT_UPDATE, ENABLE);
 
   TIM2_Cmd(ENABLE);
-#endif // ENABLE_SIMULATION
   enableInterrupts();
+#endif // ENABLE_SIMULATION
 }
 
 void main(void)
@@ -480,8 +461,12 @@ void main(void)
   CLK_CCOCmd(ENABLE);
 
   GPIO_Init(PORT_LED_PWR_EN, PIN_LED_PWR_EN, GPIO_MODE_OUT_PP_HIGH_SLOW); // PB0: IR_LED_PWR_EN active high
+
+#ifdef ENABLE_UART
   UART1_Init(115200, UART1_WORDLENGTH_8D, UART1_STOPBITS_1, UART1_PARITY_NO, UART1_SYNCMODE_CLOCK_DISABLE,
              UART1_MODE_TXRX_ENABLE); // UART1 init
+#endif
+
   GPIO_Init(PORT_LATCH, PIN_LATCH, GPIO_MODE_OUT_PP_LOW_SLOW);
   GPIO_Init(PORT_N_OE, PIN_N_OE, GPIO_MODE_OUT_PP_HIGH_SLOW);
   GPIO_Init(GPIOC, GPIO_PIN_7, GPIO_MODE_OUT_PP_HIGH_SLOW); // "DATA1" on HDK 1.2 schematics
@@ -517,7 +502,9 @@ void main(void)
   // enable interrupts
   enableInterrupts();
 
+#ifdef ENABLE_UART
   protocol_init();
+#endif
 
   default_array_init();
 
@@ -554,21 +541,13 @@ void main(void)
       break;
     }
 
-    /*
-    if( UART1_GetFlagStatus(UART1_FLAG_RXNE) == SET )
-    {
-        uint8_t ch = UART1_ReceiveData8();
-
-        if( UART1_GetFlagStatus(UART1_FLAG_TXE) == SET )
-          UART1_SendData8( ch );
-    }
-    */
-
+#ifdef ENABLE_UART
     if (UART1_GetFlagStatus(UART1_FLAG_RXNE) == SET)
       protocol_put_input_byte(UART1_ReceiveData8());
 
     if (UART1_GetFlagStatus(UART1_FLAG_TXE) == SET && protocol_is_output_ready())
       UART1_SendData8(protocol_get_output_byte());
+#endif
   }
 }
 
