@@ -29,7 +29,7 @@ int main() {
 
   for (int patt = 0; patt < PATTERN_COUNT; ++patt) {
     std::cout << std::setw(2) << std::setfill('0') << patt << ": ";
-    for (int b = LED_LINE_LENGTH * 2 - 1; b; --b) {
+    for (int b = 0; b < DRIVER_BUFFER_LENGTH; ++b) {
       std::cout << " 0x" << std::hex << std::setw(2) << std::setfill('0')
                 << int(ir_led_driver_buffer[patt][b]);
     }
