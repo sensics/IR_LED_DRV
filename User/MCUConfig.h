@@ -64,4 +64,29 @@
 /// Simulation timer period, unknown units.
 #define SIMULATION_PERIOD 70
 
+/// Ports and pins
+
+// PB0: IR_LED_PWR_EN active high
+#define PORT_LED_PWR_EN GPIOB
+#define PIN_LED_PWR_EN GPIO_PIN_0
+
+#define PORT_LATCH GPIOC
+#define PIN_LATCH GPIO_PIN_2
+
+#define PORT_N_OE GPIOC
+#define PIN_N_OE GPIO_PIN_3
+
+#define PORT_CAMERA_SYNC GPIOD
+#define PIN_CAMERA_SYNC GPIO_PIN_7
+#define EXTI_CAMERA_SYNC EXTI_PORT_GPIOD
+
+#define PORT_TESTPOINT_7 GPIOD
+#define PIN_TESTPOINT_7 GPIO_PIN_0
+#define PORT_TESTPOINT_8 GPIOD
+#define PIN_TESTPOINT_8 GPIO_PIN_2
+#define PORT_TESTPOINT_9 GPIOD
+#define PIN_TESTPOINT_9 GPIO_PIN_3
+#define PORT_TESTPOINT_10 GPIOD
+#define PIN_TESTPOINT_10 GPIO_PIN_4
+
 #endif
