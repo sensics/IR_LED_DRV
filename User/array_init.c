@@ -26,6 +26,7 @@
 /* - none - */
 
 // clang-format off
+#if 1
 EEPROM uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
 {
     {29,0,32,136,16},
@@ -45,6 +46,28 @@ EEPROM uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
     {140,144,4,32,64},
     {13,69,0,32,64}
 };
+#else
+/// Pattern for testing sync.
+EEPROM uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
+{
+    {0x03,0,0x30,0,0},
+    {0x03,0,0x30,0,0},
+    {0,0x03,0,0,0x30},
+    {0,0x03,0,0,0x30},
+    {0x30,0,0x03,0,0},
+    {0x30,0,0x03,0,0},
+    {0,0x30,0,0x03,0},
+    {0,0x30,0,0x03,0},
+    {0,0,0x30,0,0x03},
+    {0,0,0x30,0,0x03},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0}
+};
+#endif
 // clang-format on
 
 TINY uint8_t pattern_array[PATTERN_COUNT][LED_LINE_LENGTH];
