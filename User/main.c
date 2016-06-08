@@ -178,7 +178,7 @@ typedef enum {
 
 State_t _procState = STATE_PROCESS_AWAITING_START;
 
-uint8_t _subState   = 0;
+uint8_t _subState = 0;
 
 static void Send_blanks_spi_data()
 {
@@ -253,8 +253,8 @@ static inline void actuallyStartFlashProcess()
   GPIO_WriteHigh(PORT_TESTPOINT_9, PIN_TESTPOINT_9);
 
   // start blank sequence
-  _subState   = 0;
-  _procState  = STATE_PATTERN_ON;
+  _subState  = 0;
+  _procState = STATE_PATTERN_ON;
 }
 
 // can be called from anywhere - it just starts flash process
@@ -347,7 +347,7 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
 
       // allow new pattern to be written to LEDs
       _procState = STATE_AWAITING_PATTERN;
-      _subState = 0;
+      _subState  = 0;
     }
     break;
   case STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD:
@@ -558,7 +558,7 @@ void main(void)
       _procState = STATE_BETWEEN_PULSES_AWAITING_TIMER;
       break;
     case STATE_AWAITING_PATTERN:
-      // Move to the next value in the patterns
+// Move to the next value in the patterns
 #ifdef ENABLE_SIMULATION
       if (_simulation_in_process)
         Send_blanks_spi_data();
