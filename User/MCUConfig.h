@@ -90,12 +90,23 @@
 #define PIN_CAMERA_SYNC GPIO_PIN_7
 #define EXTI_CAMERA_SYNC EXTI_PORT_GPIOD
 
+/// Level reversed on every external (sync) interrupt.
+/// testpoint 7 on Sensics schematic, TP22 on HDK 1.2 schematic
 #define PORT_TESTPOINT_7 GPIOD
 #define PIN_TESTPOINT_7 GPIO_PIN_0
+
+/// Level reversed on every simulation interrupt.
+/// testpoint 8 on Sensics schematic, TP23 on HDK 1.2 schematic
 #define PORT_TESTPOINT_8 GPIOD
 #define PIN_TESTPOINT_8 GPIO_PIN_2
+
+/// Goes high after initial pattern pulse starts, low just before it ends.
+/// testpoint 9 on Sensics schematic, TP24 on HDK 1.2 schematic
 #define PORT_TESTPOINT_9 GPIOD
 #define PIN_TESTPOINT_9 GPIO_PIN_3
+
+/// Goes high at the start of the process timer handler, low at the end
+/// testpoint 10 on Sensics schematic, TP25 on HDK 1.2 schematic
 #define PORT_TESTPOINT_10 GPIOD
 #define PIN_TESTPOINT_10 GPIO_PIN_4
 
