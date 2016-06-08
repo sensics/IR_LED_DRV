@@ -819,7 +819,7 @@
         <option>
           <name>GenCodeModel</name>
           <version>0</version>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>GenDataModel</name>
@@ -858,7 +858,7 @@
         </option>
         <option>
           <name>GenRTConfigPath</name>
-          <state>$TOOLKIT_DIR$\LIB\dlstm8mmn.h</state>
+          <state>$TOOLKIT_DIR$\LIB\dlstm8smn.h</state>
         </option>
         <option>
           <name>GenLibInFormatter</name>
@@ -1599,6 +1599,9 @@
   </configuration>
   <group>
     <name>StdPeriph_Drivers</name>
+    <file>
+      <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\inc\stm8s.h</name>
+    </file>
     <file>
       <name>$PROJ_DIR$\Vendor\STM8S_StdPeriph_Driver\src\stm8s_adc1.c</name>
       <excluded>
