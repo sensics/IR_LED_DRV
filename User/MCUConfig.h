@@ -47,7 +47,8 @@
 
 /// Periods in microseconds.
 #define FLASH_BRIGHT_PERIOD 250
-#define FLASH_INTERVAL_PERIOD 40
+/// if you make this too small, will run out of time to upload the dim pattern.
+#define FLASH_INTERVAL_PERIOD 100
 #define FLASH_DIM_PERIOD 25
 
 /// Simulation timer period, unknown units.
