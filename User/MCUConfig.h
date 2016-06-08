@@ -89,6 +89,9 @@
 #define PORT_CAMERA_SYNC GPIOD
 #define PIN_CAMERA_SYNC GPIO_PIN_7
 #define EXTI_CAMERA_SYNC EXTI_PORT_GPIOD
+/// Port D7 is the TLI source
+#define CAMERA_SYNC_IRQ_VECTOR ITC_IRQ_TLI
+#define CAMERA_SYNC_IS_TLI_SOURCE
 
 /// Level reversed on every external (sync) interrupt.
 /// testpoint 7 on Sensics schematic, TP22 on HDK 1.2 schematic

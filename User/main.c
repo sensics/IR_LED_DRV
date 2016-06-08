@@ -427,8 +427,8 @@ INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, ITC_IRQ_TIM2_OVF)
 uint8_t gotSync = 0;
 #endif
 
-// called by change on external pin (sync signal, exposure)
-INTERRUPT_HANDLER(TLI_IRQHandler, ITC_IRQ_TLI)
+// called by sync signal
+INTERRUPT_HANDLER(EXTI_SyncHandler, CAMERA_SYNC_IRQ_VECTOR)
 {
   // test point output
   GPIO_WriteReverse(PORT_TESTPOINT_7, PIN_TESTPOINT_7);
@@ -503,6 +503,13 @@ void set_interval_simulator(uint8_t simulation_period_time_ms)
 void main(void)
 {
   CLK_DeInit();
+  GPIO_DeInit(GPIOD);
+  EXTI_DeInit();
+
+  // timer initialization (simulation timer)
+  TIM1_DeInit();
+  TIM2_DeInit();
+
   CLK_HSICmd(ENABLE); // Internal 16 MHz clock enable
   CLK_SYSCLKConfig(CLK_PRESCALER_HSIDIV1);
   /// switch clock source to high speed external
@@ -534,7 +541,6 @@ void main(void)
   SPI_Cmd(ENABLE);
 
   // Init test points outputs on port D
-  GPIO_DeInit(GPIOD);
   GPIO_Init(PORT_TESTPOINT_7, PIN_TESTPOINT_7, GPIO_MODE_OUT_PP_LOW_SLOW);
   GPIO_Init(PORT_TESTPOINT_8, PIN_TESTPOINT_8, GPIO_MODE_OUT_PP_LOW_SLOW);
   GPIO_Init(PORT_TESTPOINT_9, PIN_TESTPOINT_9, GPIO_MODE_OUT_PP_LOW_SLOW);
@@ -542,20 +548,18 @@ void main(void)
 
   // Init external IRQ
   GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
+  disableInterrupts();
 #ifdef TRIGGER_ON_RISE
   EXTI_SetExtIntSensitivity(EXTI_CAMERA_SYNC, EXTI_SENSITIVITY_RISE_ONLY);
+#ifdef CAMERA_SYNC_IS_TLI_SOURCE
   EXTI_SetTLISensitivity(EXTI_TLISENSITIVITY_RISE_ONLY);
+#endif // CAMERA_SYNC_IS_TLI_SOURCE
 #else
   EXTI_SetExtIntSensitivity(EXTI_CAMERA_SYNC, EXTI_SENSITIVITY_FALL_ONLY);
+#ifdef CAMERA_SYNC_IS_TLI_SOURCE
   EXTI_SetTLISensitivity(EXTI_TLISENSITIVITY_FALL_ONLY);
+#endif // CAMERA_SYNC_IS_TLI_SOURCE
 #endif
-
-  // timer initialization (simulation timer)
-  TIM1_DeInit();
-  TIM2_DeInit();
-
-  // enable interrupts
-  enableInterrupts();
 
 #ifdef ENABLE_UART
   protocol_init();
@@ -573,6 +577,9 @@ void main(void)
   set_interval_simulator(_simulation_period);
 
   index_16 = 0;
+
+  // enable interrupts
+  enableInterrupts();
 
   while (1)
   {
