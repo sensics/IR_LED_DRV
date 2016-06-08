@@ -65,14 +65,14 @@ uint8_t index_16 = 15;
 #define MAX_FLASH_PERIOD 2000
 
 /// Offset taken (reducing timer duration) to account for computational overhead
-/// (?) when setting flash period
-#define MAX_FLASH_PERIOD_ADJUSTMENT 20
+/// when setting flash period, to achieve correct duration validated by logic analyzer
+#define MAX_FLASH_PERIOD_ADJUSTMENT 13
 /// Offset taken (reducing timer duration) to account for computational overhead
-/// (?) when setting blank period
-#define MAX_BLANK_PERIOD_ADJUSTMENT 15
+/// when setting blank period, to achieve correct duration validated by logic analyzer
+#define MAX_BLANK_PERIOD_ADJUSTMENT 14
 /// Offset taken (reducing timer duration) to account for computational overhead
-/// (?) when setting interval period
-#define MAX_INTERVAL_PERIOD_ADJUSTMENT 15
+/// when setting interval period, to achieve correct duration validated by logic analyzer
+#define MAX_INTERVAL_PERIOD_ADJUSTMENT 14
 
 #if FLASH_BRIGHT_PERIOD <= MAX_FLASH_PERIOD_ADJUSTMENT || FLASH_BRIGHT_PERIOD >= MAX_FLASH_PERIOD
 #error "FLASH_BRIGHT_PERIOD out of range!"
