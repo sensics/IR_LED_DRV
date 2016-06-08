@@ -112,12 +112,16 @@ static void delay_ms(unsigned short msec)
   } while (--msec);
 }
 
-void SPI_SendByte(uint8_t data)
+static inline void SPI_WaitForTransmissionToComplete()
 {
   while (!(SPI->SR & SPI_SR_TXE))
-    ;
+  {
+  }
+}
+static void SPI_SendByte(uint8_t data)
+{
+  SPI_WaitForTransmissionToComplete();
   SPI->DR = data;
-  // SPI->DR = 0xFF;
 }
 
 void Send_array_spi_data()
@@ -136,6 +140,8 @@ void Send_array_spi_data()
     ptr++;
   }
 
+  /// Wait for transmission to complete.
+  SPI_WaitForTransmissionToComplete();
   Delay(1);
   GPIO_WriteHigh(PORT_LATCH, PIN_LATCH);
 }
@@ -186,6 +192,7 @@ void Send_blanks_spi_data()
     }
   }
 
+  SPI_WaitForTransmissionToComplete();
   Delay(1);
   GPIO_WriteHigh(PORT_LATCH, PIN_LATCH);
 }
