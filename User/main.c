@@ -22,6 +22,7 @@
 
 /* Library/third-party includes */
 #include "stm8s.h"
+#include "stm8s_it.h"
 
 /* Standard includes */
 #ifdef OSVR_IR_IAR_STM8
@@ -440,7 +441,7 @@ uint8_t gotSync = 0;
 #endif
 
 // called by sync signal
-INTERRUPT_HANDLER(EXTI_SyncHandler, CAMERA_SYNC_IRQ_VECTOR)
+INTERRUPT_HANDLER(TLI_IRQHandler, CAMERA_SYNC_IRQ_VECTOR)
 {
   // test point output
   GPIO_WriteReverse(PORT_TESTPOINT_7, PIN_TESTPOINT_7);
