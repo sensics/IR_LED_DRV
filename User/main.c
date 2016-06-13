@@ -139,13 +139,14 @@ static inline void SPI_WaitForTransmissionToComplete()
   {
   }
 }
+
 static void SPI_SendByte(uint8_t data)
 {
   SPI_WaitForTransmissionToComplete();
   SPI->DR = data;
 }
 
-void Send_array_spi_data()
+static void Send_array_spi_data()
 {
   GPIO_WriteLow(PORT_LATCH, PIN_LATCH); // Prepare driver latch enable for the next data latch
 
@@ -471,7 +472,7 @@ INTERRUPT_HANDLER(TLI_IRQHandler, CAMERA_SYNC_IRQ_VECTOR)
 #endif
 }
 
-void set_flash_timer_max_period(uint16_t flash_time_us)
+static void set_flash_timer_max_period(uint16_t flash_time_us)
 {
   disableInterrupts();
 
