@@ -34,7 +34,12 @@
 
 /// Time (usec) it takes from the sync signal going low, to us driving nOE low
 /// (with delay off) - measured with logic analyzer
+#if defined(OSVR_IR_IAR_STM8)
 #define SYNC_INTERRUPT_OVERHEAD 11
+#elif defined(OSVR_IR_COSMIC_STM8)
+// roughly 5.5 usec or less with Cosmic
+#define SYNC_INTERRUPT_OVERHEAD 4
+#endif
 
 /// Time (usec) that the sync signal stays low - measured with logic analyzer,
 /// but may vary between units?
@@ -77,6 +82,49 @@
 
 /// Simulation timer period, unknown units.
 #define SIMULATION_PERIOD 70
+
+#define MAX_FLASH_PERIOD 2000
+
+#ifdef OSVR_IR_IAR_STM8
+/// Offset taken (reducing timer duration) to account for computational overhead
+/// when setting flash period, to achieve correct duration validated by logic analyzer
+#define MAX_FLASH_PERIOD_ADJUSTMENT 14
+/// Offset taken (reducing timer duration) to account for computational overhead
+/// when setting blank period, to achieve correct duration validated by logic analyzer
+#define MAX_BLANK_PERIOD_ADJUSTMENT 12
+/// Offset taken (reducing timer duration) to account for computational overhead
+/// when setting interval period, to achieve correct duration validated by logic analyzer
+#define MAX_INTERVAL_PERIOD_ADJUSTMENT 12
+
+/// Additional overhead of the startup delay timer measured to be roughly 13.78usec
+#define SYNC_TIMER_DELAY_ADJUSTMENT 13
+
+#elif defined(OSVR_IR_COSMIC_STM8)
+
+/// Cosmic has different timings...
+#define MAX_FLASH_PERIOD_ADJUSTMENT 7
+#define MAX_BLANK_PERIOD_ADJUSTMENT 7
+#define MAX_INTERVAL_PERIOD_ADJUSTMENT 7
+
+#define SYNC_TIMER_DELAY_ADJUSTMENT 6
+
+#endif
+
+#if FLASH_BRIGHT_PERIOD <= MAX_FLASH_PERIOD_ADJUSTMENT || FLASH_BRIGHT_PERIOD >= MAX_FLASH_PERIOD
+#error "FLASH_BRIGHT_PERIOD out of range!"
+#endif
+#if FLASH_INTERVAL_PERIOD <= MAX_INTERVAL_PERIOD_ADJUSTMENT || FLASH_INTERVAL_PERIOD >= MAX_FLASH_PERIOD
+#error "FLASH_INTERVAL_PERIOD out of range!"
+#endif
+#if FLASH_DIM_PERIOD <= MAX_BLANK_PERIOD_ADJUSTMENT || FLASH_DIM_PERIOD >= MAX_FLASH_PERIOD
+#error "FLASH_DIM_PERIOD out of range!"
+#endif
+
+#if defined(SYNC_DELAY_TOTAL_US) && defined(SYNC_DELAY_TIMER)
+#if SYNC_DELAY_TOTAL_US > MAX_FLASH_PERIOD
+#error "Total sync delay exceeds maximum possible for SYNC_DELAY_TIMER mode!"
+#endif
+#endif
 
 /// Ports and pins
 

@@ -32,6 +32,7 @@
 // On IAR C compiler
 #define OSVR_IR_EMBEDDED
 #define OSVR_IR_IAR_STM8
+#define OSVR_IR_STM8
 
 #include "stm8s.h" // for uint8_t without conflicts
 
@@ -40,6 +41,7 @@
 /// @todo detect target, not just compiler
 #define OSVR_IR_EMBEDDED
 #define OSVR_IR_COSMIC_STM8
+#define OSVR_IR_STM8
 
 #include "stm8s.h" // for uint8_t without conflicts
 

@@ -52,36 +52,6 @@ uint8_t index_16 = 15;
 /// _flash_period + 5 * _flash_blank_period + 5 *
 /// _flash_interval_period
 /// @{
-#define MAX_FLASH_PERIOD 2000
-
-/// Offset taken (reducing timer duration) to account for computational overhead
-/// when setting flash period, to achieve correct duration validated by logic analyzer
-#define MAX_FLASH_PERIOD_ADJUSTMENT 13
-/// Offset taken (reducing timer duration) to account for computational overhead
-/// when setting blank period, to achieve correct duration validated by logic analyzer
-#define MAX_BLANK_PERIOD_ADJUSTMENT 14
-/// Offset taken (reducing timer duration) to account for computational overhead
-/// when setting interval period, to achieve correct duration validated by logic analyzer
-#define MAX_INTERVAL_PERIOD_ADJUSTMENT 14
-
-/// Additional overhead of the startup delay timer measured to be roughly 13.78usec
-#define SYNC_TIMER_DELAY_ADJUSTMENT 14
-
-#if FLASH_BRIGHT_PERIOD <= MAX_FLASH_PERIOD_ADJUSTMENT || FLASH_BRIGHT_PERIOD >= MAX_FLASH_PERIOD
-#error "FLASH_BRIGHT_PERIOD out of range!"
-#endif
-#if FLASH_INTERVAL_PERIOD <= MAX_INTERVAL_PERIOD_ADJUSTMENT || FLASH_INTERVAL_PERIOD >= MAX_FLASH_PERIOD
-#error "FLASH_INTERVAL_PERIOD out of range!"
-#endif
-#if FLASH_DIM_PERIOD <= MAX_BLANK_PERIOD_ADJUSTMENT || FLASH_DIM_PERIOD >= MAX_FLASH_PERIOD
-#error "FLASH_DIM_PERIOD out of range!"
-#endif
-
-#if defined(SYNC_DELAY_TOTAL_US) && defined(SYNC_DELAY_TIMER)
-#if SYNC_DELAY_TOTAL_US > MAX_FLASH_PERIOD
-#error "Total sync delay exceeds maximum possible for SYNC_DELAY_TIMER mode!"
-#endif
-#endif
 
 uint16_t _flash_blank_period    = FLASH_DIM_PERIOD;      // max 2000
 uint16_t _flash_interval_period = FLASH_INTERVAL_PERIOD; // max 2000

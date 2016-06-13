@@ -6,6 +6,13 @@
 *.ewt
 /settings/
 
+# Generated stuff from STVD
+*.wed
+*.wdb
+/Release/STVD/
+/Debug/STVD/
+*.spy
+
 # Ignore build products except for the output hex files
 Obj/
 List/

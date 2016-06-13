@@ -10,3 +10,11 @@ We've used the 2.2.0 release of the libraries from here: <http://www.st.com/web/
 1. You'll download a file called `en.stsw-stm8069.zip`. Extract it.
 2. Move the `STM8S-StdPeriph_Driver` directory (from inside the `Libraries` directory extracted from the zip) into this `Vendor` directory.
 3. Move the `STM8S_StdPeriph_Template` directory (from inside the `Project` directory extracted from the zip) into this `Vendor` directory. (We actually only need the two header files in that directory, but it's easiest to just grab the whole directory.)
+
+## Note to Cosmic compiler users
+If you're using the Cosmic compiler, you'll need to use the `Makefile` in this directory to pre-build these sources into a library.
+A typical GNU Make will work fine - if you're on Windows, try using [Chocolatey](http://chocolatey.org) and run `choco install -y make` to get a system-wide install.
+Then, just run `make` here (passing alternate, double-quoted paths to `cxstm8.exe` as CC= and `clib.exe` as LIB= on the command line if the defaults in the `Makefile` don't match your system.)
+
+It will spit out a `StdPeriph_Driver0.sm8` file in this directory, in addition to the intermediate files in `Release` that can be ignored (and that are gitignored).
+

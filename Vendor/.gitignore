@@ -1,2 +1,5 @@
 /STM8S_StdPeriph_Driver/
 /STM8S_StdPeriph_Template/
+Release/
+Debug/
+*.sm8

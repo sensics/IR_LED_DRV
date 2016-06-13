@@ -18,7 +18,7 @@
 #include "array_init.h"
 
 /* Library/third-party includes */
-#ifdef OSVR_IR_IAR_STM8
+#ifdef OSVR_IR_STM8
 #include "stm8s.h"
 #endif
 
