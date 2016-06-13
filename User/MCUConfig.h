@@ -43,9 +43,10 @@
 
 /// Time (usec) that the sync signal stays low - measured with logic analyzer,
 /// but may vary between units?
-#define SYNC_LOW_DURATION 233
+#define SYNC_LOW_DURATION 236
 
-#define TRIGGER_ON_RISE
+/// Doesn't work right now?
+//#define TRIGGER_ON_RISE
 
 /// Delay (msec) at the beginning of of the flash process
 //#define SYNC_DELAY_MS 0
@@ -75,10 +76,21 @@
 #endif
 
 /// Periods in microseconds.
-#define FLASH_BRIGHT_PERIOD 250
+#undef LOW_GAIN_MODE
+#ifdef LOW_GAIN_MODE
+
+/// These are for "low-gain" camera mode
+#define FLASH_BRIGHT_PERIOD 550
 /// if you make this too small, will run out of time to upload the dim pattern.
+#define FLASH_INTERVAL_PERIOD 70
+#define FLASH_DIM_PERIOD 200
+
+#else
+
+#define FLASH_BRIGHT_PERIOD 150
 #define FLASH_INTERVAL_PERIOD 100
-#define FLASH_DIM_PERIOD 25
+#define FLASH_DIM_PERIOD 20
+#endif
 
 /// Simulation timer period, unknown units.
 #define SIMULATION_PERIOD 70
