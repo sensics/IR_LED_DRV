@@ -535,8 +535,8 @@ void protocol_parse_pattern_write()
     protocol_output_error("index", 9);
     return;
   }
-
-  for (uint8_t i = 0, j = 0; i < LED_LINE_LENGTH; i++)
+  uint8_t i, j;
+  for (i = 0, j = 0; i < LED_LINE_LENGTH; i++)
   {
 
     uint8_t value;
@@ -587,7 +587,8 @@ void protocol_parse_pattern_read()
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
   protocol_put_hex_nibble(index);
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
-  for (uint8_t i = 0; i < LED_LINE_LENGTH; i++)
+  uint8_t i;
+  for (i = 0; i < LED_LINE_LENGTH; i++)
   {
     protocol_put_hex_uint8(pattern_array[index][i]);
     protocol_put_output_byte(UART_CHARACTER_COMMA);

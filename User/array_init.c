@@ -76,7 +76,8 @@ NEAR uint8_t ir_led_driver_buffer[PATTERN_COUNT][DRIVER_BUFFER_LENGTH];
 
 void line_array_init(uint8_t index, uint8_t *value)
 {
-  for (uint8_t j = 0, k = 0; j < LED_LINE_LENGTH; j++)
+  uint8_t j, k;
+  for (j = 0, k = 0; j < LED_LINE_LENGTH; j++)
   {
     ir_led_driver_buffer[index][k] = 0;
     if (value[j] & 0x01)
@@ -103,9 +104,11 @@ void line_array_init(uint8_t index, uint8_t *value)
 
 void default_array_init(void)
 {
-  for (uint8_t i = 0; i < PATTERN_COUNT; i++)
+  uint8_t i;
+  for (i = 0; i < PATTERN_COUNT; i++)
   {
-    for (uint8_t j = 0; j < LED_LINE_LENGTH; j++)
+    uint8_t j;
+    for (j = 0; j < LED_LINE_LENGTH; j++)
     {
       pattern_array[i][j] = default_pattern_array[i][j];
     }

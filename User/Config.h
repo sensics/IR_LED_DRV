@@ -35,6 +35,14 @@
 
 #include "stm8s.h" // for uint8_t without conflicts
 
+#elif defined(__CSMC__)
+// On Cosmic C compiler
+/// @todo detect target, not just compiler
+#define OSVR_IR_EMBEDDED
+#define OSVR_IR_COSMIC_STM8
+
+#include "stm8s.h" // for uint8_t without conflicts
+
 #else
 // We are not on an embedded compiler
 #define OSVR_IR_DESKTOP

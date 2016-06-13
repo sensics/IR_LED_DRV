@@ -19,14 +19,18 @@
 #ifndef INCLUDED_MCUConfig_h_GUID_D1C232A1_AC37_47A3_347A_DFA3E6FE70CA
 #define INCLUDED_MCUConfig_h_GUID_D1C232A1_AC37_47A3_347A_DFA3E6FE70CA
 
+#include "Config.h"
+
 /// Enable development options
 #define ENABLE_DEV
 
 /// running patterns even when no sync arrives.
 #define ENABLE_SIMULATION
 
-/// enable the serial console
+/// enable the serial console - except on Cosmic, can't make it fit there.
+#ifndef OSVR_IR_COSMIC_STM8
 #define ENABLE_UART
+#endif
 
 /// Time (usec) it takes from the sync signal going low, to us driving nOE low
 /// (with delay off) - measured with logic analyzer

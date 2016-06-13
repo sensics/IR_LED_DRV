@@ -24,7 +24,9 @@
 #include "stm8s.h"
 
 /* Standard includes */
+#ifdef OSVR_IR_IAR_STM8
 #include "intrinsics.h" //__enable_interrupt ().
+#endif
 
 /// Warnings related to dev and production.
 #ifdef ENABLE_DEV
@@ -95,9 +97,12 @@ static void Delay(uint16_t n)
 /// USEC_TO_TICKS
 /// Based on how long the following loop is for each compiler:
 /// while (n--) {}
-#if defined(__ICCSTM8__)
+#if defined(OSVR_IR_IAR_STM8)
 // this loop is ldw, decw, tnzw, jrne on IAR - so 5 (5.5?) cycles.
 #define USEC_TO_TICKS(USEC) (((unsigned short)((MCU_CLOCK * (unsigned long)USEC) / 1000000UL) - 5) / 5)
+#elif defined(OSVR_IR_COSMIC_STM8)
+// this loop is ldw, decw, ldw, incw, jrne on Cosmic - so 6 (6.5?) cycles.
+#define USEC_TO_TICKS(USEC) (((unsigned short)((MCU_CLOCK * (unsigned long)USEC) / 1000000UL) - 6) / 6)
 #else
 #error unported to this compiler
 #endif
@@ -124,6 +129,8 @@ static void delay_ms(unsigned short msec)
 // restore diagnostic state
 #pragma diag_default = Pe177
 #endif // __ICCSTM8__
+
+void SPI_WaitForTransmissionToComplete();
 
 static inline void SPI_WaitForTransmissionToComplete()
 {
@@ -186,8 +193,8 @@ static void Send_blanks_spi_data()
 
   SPI_SendByte((uint8_t)0x00); // for 96 bit EVB
   SPI_SendByte((uint8_t)0x00); // for 96 bit EVB
-
-  for (int i = 0; i < LED_LINE_LENGTH; i++)
+  int i;
+  for (i = 0; i < LED_LINE_LENGTH; i++)
   {
     if (i == _subState)
     {
@@ -237,6 +244,8 @@ void set_interval_period(uint16_t period)
   _flash_interval_period_as_timer = MAX_FLASH_PERIOD - (_flash_interval_period - MAX_INTERVAL_PERIOD_ADJUSTMENT);
 }
 
+void actuallyStartFlashProcess();
+
 static inline void actuallyStartFlashProcess()
 {
   // turn-on flash
@@ -257,6 +266,7 @@ static inline void actuallyStartFlashProcess()
   _procState = STATE_PATTERN_ON;
 }
 
+void enable_sync_interrupt();
 /// Requires that you've already used GPIO_Init to do the overall, full pin setup: this just flips one bit to enable the
 /// external interrupt, which is much (over 10usec) faster.
 static inline void enable_sync_interrupt()
@@ -264,6 +274,8 @@ static inline void enable_sync_interrupt()
   // Set pin's bit in CR2 register
   PORT_CAMERA_SYNC->CR2 |= (uint8_t)PIN_CAMERA_SYNC;
 }
+
+void disable_sync_interrupt();
 
 /// Requires that you've already used GPIO_Init to do the overall, full pin setup: this just flips one bit to disable
 /// the external interrupt, which is much (over 10usec) faster.
