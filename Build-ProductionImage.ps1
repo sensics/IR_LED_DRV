@@ -13,7 +13,7 @@ Start-Process (Join-Path $IARRoot "common\bin\IarBuild.exe") -ArgumentList @('Pr
 
 # Generate the config file by grepping for the build string in the elf file.
 # Couldn't find any better way to extract this from the object files or final elf file...
-$BuildString = (strings -q (Join-Path $PSScriptRoot 'Production\Exe\Project.out') | Select-String -Pattern '\[Sensics')
+$BuildString = (strings (Join-Path $PSScriptRoot 'Production\Exe\Project.out') | Select-String -Pattern '\[Sensics')
 Out-File (Join-Path $PSScriptRoot 'Production\Exe\Config.txt') -InputObject $BuildString
 
 Write-Host 'Completed build identified as:'
