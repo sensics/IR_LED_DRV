@@ -13,6 +13,10 @@ Production builds use IAR Embedded Workbench (https://www.iar.com/iar-embedded-w
 It is small enough to build with the free Kickstart license, though note that you will get a sales call after registering for one.
 You can also use the no-charge license for the COSMIC compiler and ST Visual Developer to build the project.
 
-- Source code is in 'user' subdirectory
-- ST-supplied library files in 'vendor' subdirectory - you will need to download and extract these frm release version 2.2.0 available at <http://www.st.com/web/en/catalog/tools/FM147/CL1794/SC1807/SS1754/PF258009> - see directory for details.
+- Source code primarily targeted to the MCU (firmware) is in `user` subdirectory.
+- Source code for desktop tools that assist in development (computing/interpreting pattern arrays, computing masks, finding "bright neighbors") is in the `Desktop` subdirectory. This code can be built using CMake and your typical desktop C++11-supporting compiler.
+- ST-supplied library files for use in building firmware go in the `Vendor` subdirectory - you will need to download and extract these frm release version 2.2.0 available at <http://www.st.com/web/en/catalog/tools/FM147/CL1794/SC1807/SS1754/PF258009> - see directory for details.
 - Hardware files in 'Schematics' subdirectory
+
+## License
+- Sources in `User` and `Desktop`: Licensed under the Apache License, Version 2.0.
