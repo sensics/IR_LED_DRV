@@ -40,13 +40,12 @@
 // clang-format off
 /*
 Input data producing this mask:
-/// 1-based indices WRT the tracking software of beacons we'd like to disable.
-static const auto DISABLED_TARGET0_BEACONS = {33, 13, 18, 32, 34, 5};
+/// No beacons on target 0 disabled.
 
 /// 1-based indices WRT the tracking software of the beacons on the rear that never light up anyway.
 static const auto DISABLED_TARGET1_BEACONS = {1, 4};
 */
-EEPROM uint8_t default_mask[LED_LINE_LENGTH] = {0xf1, 0xff, 0xb7, 0xbf, 0x6f};
+EEPROM uint8_t default_mask[LED_LINE_LENGTH] = {0xff, 0xff, 0xff, 0xff, 0x6f};
 
 #if 1
 EEPROM uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
