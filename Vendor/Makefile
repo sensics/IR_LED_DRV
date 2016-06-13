@@ -19,21 +19,37 @@
 
 
 OUTDIR := Release
-OUTPUT := StdPeriph_Driver
-EXT := sm8
 # Compilation model: one of mods, modsl, modsl0, mods0
+# Should match the application.
 MODEL := mods0
 #MODEL = mods
-# for the STM8S003K3 on the reference and HDK IR boards
-MCU := STM8S003
 CC := "C:/Program Files (x86)/COSMIC/FSE_Compilers/CXSTM8/cxstm8.exe"
 LIB := "C:/Program Files (x86)/COSMIC/FSE_Compilers/CXSTM8/clib.exe"
 
+# for the STM8S003K3 on the reference and HDK IR boards
+MCU := STM8S003
+
+# These are the only modules we need for this firmware - no need to build extra,
+# and not all modules are supported by the MCU used.
+OBJ_BASES := clk exti gpio spi tim1 tim2 uart1
+
+
+OUTPUT := StdPeriph_Driver
+EXT := sm8
+
 SRC_ROOT := STM8S_StdPeriph_Driver
-CFLAGS =  +split +debug
+# -oc causes the assembly peephole optimizer to comment-out the things it removes
+# +split is basically gcc's -ffunction-sections
+# +compact is rather like -Os while I imagine
+# +fast is like -O3:
+# the difference is that +compact adds essentially -of7 (assembly optimizer: limit depth to 7)
+# to a "base" set of invocations while +fast adds -gi (code generator: inline
+# machine library calls for long integers handling) to a base, so while the + flags themselves are exclusive,
+# the things they enable are not.
+# Leaving the default (neither one)seems reasonable, too.
+CFLAGS = +split +debug -pc99 -oc
 ALL_CFLAGS = +$(MODEL) \
-             +compact \
-             -pc99 \
+             -v \
              -l \
              -d$(MCU) \
              -i$(SRC_ROOT)/inc \
@@ -43,43 +59,32 @@ ALL_CFLAGS = +$(MODEL) \
              -co$(OUTDIR)\  # -ppb
 
 # Parse out compilation model to add suffix to our own library name.
-ifneq (,$(findstring l,$(MODEL)))
-# either modsl or modsl0
-LIBNAME_SUFFIX_STACKSIZE := l
-else
-LIBNAME_SUFFIX_STACKSIZE :=
-endif
 
-ifneq (,$(findstring 0,$(MODEL)))
-# either mods0 or modsl0
-LIBNAME_SUFFIX_APPSIZE := 0
-else
-LIBNAME_SUFFIX_APPSIZE :=
-endif
+# an l (lowercase L) if it's either modsl or modsl0, else it's empty
+LIBNAME_SUFFIX_STACKSIZE := $(findstring l,$(MODEL))
+# a 0 if it's either mods0 or modsl0, else it's empty
+LIBNAME_SUFFIX_APPSIZE := $(findstring 0,$(MODEL))
 
 # Suffix determined based on $(MODEL) to match standard libraries' convention
-LIBNAME_SUFFIX := $(LIBNAME_SUFFIX_STACKSIZE)$(LIBNAME_SUFFIX_APPSIZE)
+LIBNAME_SUFFIX := $(strip $(LIBNAME_SUFFIX_STACKSIZE))$(strip $(LIBNAME_SUFFIX_APPSIZE))
 
 # Output library name.
-LIBNAME := $(OUTPUT)$(LIBNAME_SUFFIX)
-
+LIBNAME := $(OUTPUT)$(strip $(LIBNAME_SUFFIX))
+LIBNAME_FULL := $(LIBNAME).$(EXT)
 # Main, default target.
-all: $(LIBNAME).$(EXT)
+all: $(LIBNAME_FULL)
 .PHONY: all
 
 # Dealing with Windows commands that get confused by forward slashes...
 PATH_SEPARATOR = \
 PATH_CONVERT = $(subst /,$(PATH_SEPARATOR),$1)
 
-# These are the only modules we need for this firmware - no need to build extra,
-# and not all modules are supported by the MCU used.
-OBJ_BASES := clk exti gpio spi tim1 tim2 uart1
-
+# Compute the full object filenames from the "base" names specified above
 OBJECTS := $(patsubst %,$(OUTDIR)/stm8s_%.o,$(OBJ_BASES))
 
 CLEAN_OUTPUTS := $(OBJECTS) \
-                 $(patsubst %.o,%.ls,$(OBJECTS)) \
-                 $(LIBNAME).$(EXT) \
+                 $(OBJECTS:%.o:%.ls) \
+                 $(LIBNAME_FULL) \
                  $(LIBNAME).lkf
 DOS_CLEAN_OUTPUTS := $(subst /,\,$(CLEAN_OUTPUTS))
 
@@ -87,13 +92,13 @@ DOS_CLEAN_OUTPUTS := $(subst /,\,$(CLEAN_OUTPUTS))
 $(OUTDIR):
 	mkdir $(OUTDIR)
 
-# Compile .c -> .o
-$(OUTDIR)/%.o: $(SRC_ROOT)/src/%.c $(OUTDIR)
+# Compile .c -> .o (and the .ls assembly listings with C interspersed)
+$(OUTDIR)/%.o $(OUTDIR)/%.ls: $(SRC_ROOT)/src/%.c $(OUTDIR)
 	$(CC) $(ALL_CFLAGS) $<
 
-# Use library tool
-$(LIBNAME).$(EXT): $(OBJECTS)
-	$(LIB) -c $(LIBNAME).$(EXT) $(OBJECTS)
+# Use library tool to generate the LIBNAME_FULL
+$(LIBNAME_FULL): $(OBJECTS)
+	$(LIB) -c $(LIBNAME_FULL) $(OBJECTS)
 
 clean:
 	cmd /c "del /q $(DOS_CLEAN_OUTPUTS)"
