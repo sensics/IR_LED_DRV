@@ -15,13 +15,13 @@ Toolset=STM8 Cosmic
 [Config.0]
 ConfigName=Debug
 Target=$(ProjectSFile).elf
-OutputFolder=Debug\STVD
+OutputFolder=DebugSTVD
 Debug=$(TargetFName)
 
 [Config.1]
 ConfigName=Release
 Target=$(ProjectSFile).elf
-OutputFolder=Release\STVD
+OutputFolder=ReleaseSTVD
 Debug=$(TargetFName)
 
 [Root]
@@ -65,7 +65,7 @@ String.102.0=C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8
 String.103.0=
 String.104.0=Hstm8
 String.105.0=Lib
-String.106.0=Debug\STVD
+String.106.0=DebugSTVD
 String.107.0=$(ProjectSFile).elf
 Int.108=0
 
@@ -129,8 +129,8 @@ Int.1=0
 
 [Root.Config.0.Settings.7]
 String.2.0=Running Post-Build step
-String.3.0=chex -o $(OutputPath)$(TargetSName).s19 $(OutputPath)$(TargetSName).sm8
-String.6.0=2016,6,13,11,51,53
+String.3.0=chex -fi -o $(OutputPath)$(TargetSName).hex $(OutputPath)$(TargetSName).sm8
+String.6.0=2016,8,5,14,7,11
 
 [Root.Config.0.Settings.8]
 String.2.0=Performing Custom Build on $(InputFile)
@@ -148,7 +148,7 @@ String.102.0=C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8
 String.103.0=
 String.104.0=Hstm8
 String.105.0=Lib
-String.106.0=Release\STVD
+String.106.0=ReleaseSTVD
 String.107.0=$(ProjectSFile).elf
 Int.108=0
 
@@ -173,7 +173,7 @@ String.6.0=2016,6,13,17,48,13
 
 [Root.Config.1.Settings.4]
 String.2.0=Assembling $(InputFile)...
-String.3.0=castm8 -b $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
+String.3.0=castm8 $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
 String.6.0=2016,6,13,15,44,14
@@ -212,8 +212,8 @@ Int.1=0
 
 [Root.Config.1.Settings.7]
 String.2.0=Running Post-Build step
-String.3.0=chex -o $(OutputPath)$(TargetSName).s19 $(OutputPath)$(TargetSName).sm8
-String.6.0=2016,6,13,11,51,53
+String.3.0=chex -fi -o $(OutputPath)$(TargetSName).hex $(OutputPath)$(TargetSName).sm8
+String.6.0=2016,8,5,14,7,11
 
 [Root.Config.1.Settings.8]
 String.2.0=Performing Custom Build on $(InputFile)
@@ -241,7 +241,7 @@ Settings.1.3=Root.Source Files.Config.1.Settings.3
 
 [Root.Source Files.Config.0.Settings.0]
 String.6.0=2016,6,13,11,58,21
-String.8.0=Debug\STVD
+String.8.0=DebugSTVD
 Int.0=0
 Int.1=0
 
@@ -268,7 +268,7 @@ String.6.0=2016,6,13,11,51,53
 
 [Root.Source Files.Config.1.Settings.0]
 String.6.0=2016,6,13,11,58,21
-String.8.0=Release\STVD
+String.8.0=ReleaseSTVD
 Int.0=0
 Int.1=0
 
@@ -281,7 +281,7 @@ String.6.0=2016,6,13,17,48,13
 
 [Root.Source Files.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
-String.3.0=castm8 -b $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
+String.3.0=castm8 $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
 String.6.0=2016,6,13,15,44,14
@@ -318,7 +318,7 @@ Settings.1.3=Root.Include Files.Config.1.Settings.3
 
 [Root.Include Files.Config.0.Settings.0]
 String.6.0=2016,6,13,11,58,21
-String.8.0=Debug\STVD
+String.8.0=DebugSTVD
 Int.0=0
 Int.1=0
 
@@ -345,7 +345,7 @@ String.6.0=2016,6,13,11,51,53
 
 [Root.Include Files.Config.1.Settings.0]
 String.6.0=2016,6,13,11,58,21
-String.8.0=Release\STVD
+String.8.0=ReleaseSTVD
 Int.0=0
 Int.1=0
 
@@ -358,7 +358,7 @@ String.6.0=2016,6,13,17,48,13
 
 [Root.Include Files.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
-String.3.0=castm8 -b $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
+String.3.0=castm8 $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
 String.6.0=2016,6,13,15,44,14
@@ -392,7 +392,7 @@ Settings.1.3=Root.StdPeriph_Template.Config.1.Settings.3
 
 [Root.StdPeriph_Template.Config.0.Settings.0]
 String.6.0=2016,6,13,11,58,21
-String.8.0=Debug\STVD
+String.8.0=DebugSTVD
 Int.0=0
 Int.1=0
 
@@ -419,7 +419,7 @@ String.6.0=2016,6,13,11,51,53
 
 [Root.StdPeriph_Template.Config.1.Settings.0]
 String.6.0=2016,6,13,11,58,21
-String.8.0=Release\STVD
+String.8.0=ReleaseSTVD
 Int.0=0
 Int.1=0
 
@@ -432,7 +432,7 @@ String.6.0=2016,6,13,17,48,13
 
 [Root.StdPeriph_Template.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
-String.3.0=castm8 -b $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
+String.3.0=castm8 $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
 String.6.0=2016,6,13,15,44,14
@@ -474,7 +474,7 @@ Settings.1.3=Root.User.Config.1.Settings.3
 
 [Root.User.Config.0.Settings.0]
 String.6.0=2016,6,13,11,58,21
-String.8.0=Debug\STVD
+String.8.0=DebugSTVD
 Int.0=0
 Int.1=0
 
@@ -501,7 +501,7 @@ String.6.0=2016,6,13,11,51,53
 
 [Root.User.Config.1.Settings.0]
 String.6.0=2016,6,13,11,58,21
-String.8.0=Release\STVD
+String.8.0=ReleaseSTVD
 Int.0=0
 Int.1=0
 
@@ -514,7 +514,7 @@ String.6.0=2016,6,13,17,48,13
 
 [Root.User.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
-String.3.0=castm8 -b $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
+String.3.0=castm8 $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
 String.6.0=2016,6,13,15,44,14

@@ -8,5 +8,5 @@ Filename=stvd_ir_led_drv_project.stp
 Dependencies=
 [Options]
 ActiveProject=stvd_ir_led_drv_project
-ActiveConfig=Debug
+ActiveConfig=Release
 AddSortedElements=1

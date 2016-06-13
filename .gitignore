@@ -9,8 +9,8 @@
 # Generated stuff from STVD
 *.wed
 *.wdb
-/Release/STVD/
-/Debug/STVD/
+/ReleaseSTVD/
+/DebugSTVD/
 *.spy
 
 # Ignore build products except for the output hex files

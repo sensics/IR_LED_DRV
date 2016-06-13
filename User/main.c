@@ -31,7 +31,12 @@
 
 /// Warnings related to dev and production.
 #ifdef ENABLE_DEV
+// If not in IAR, must skip this warning, since we might actually be in GCC generating input for ctags in ST Visual Develop,
+// and there's no way to distinguish the two environments :-/
+#ifdef OSVR_IR_IAR_STM8
 #warning "Development build!"
+#endif
+
 #else
 // This should be a production build.
 #ifdef SYNC_INTERVAL
@@ -44,7 +49,6 @@
 #endif
 
 #define MCU_CLOCK 16000000
-
 uint8_t index_16 = 15;
 
 /// @name Timer 1 values
