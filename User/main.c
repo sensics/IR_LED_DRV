@@ -74,7 +74,8 @@ static void Delay(uint16_t n)
 /// while (n--) {}
 #if defined(OSVR_IR_IAR_STM8)
 // this loop is ldw, decw, tnzw, jrne on IAR - so 5 (5.5?) cycles.
-#define USEC_TO_TICKS(USEC) (((unsigned short)((MCU_CLOCK * (unsigned long)USEC) / 1000000UL) - 5) / 5)
+// but that put us off by roughly a factor of 4...
+#define USEC_TO_TICKS(USEC) (unsigned short)((((MCU_CLOCK * (unsigned long)USEC) / 1000000UL) - 2) * 4 / 5)
 #elif defined(OSVR_IR_COSMIC_STM8)
 // this loop is ldw, decw, ldw, incw, jrne on Cosmic - so 6 (6.5?) cycles.
 #define USEC_TO_TICKS(USEC) (((unsigned short)((MCU_CLOCK * (unsigned long)USEC) / 1000000UL) - 6) / 6)
