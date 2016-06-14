@@ -48,12 +48,20 @@
 /// Doesn't work right now?
 //#define TRIGGER_ON_RISE
 
+/// Alternate method of triggering on rise, when plain old triggering on rise doesn't work.
+#define WAIT_FOR_RISE
+
+#if defined(TRIGGER_ON_RISE) && defined(WAIT_FOR_RISE)
+#error "Can't both trigger on rise and wait for rise - only one method of timing to rise can be used at once."
+#endif
+
 /// Delay (msec) at the beginning of of the flash process
 //#define SYNC_DELAY_MS 0
 /// Delay (usec, <1000) at the beginning of of the flash process
 //#define SYNC_DELAY_US 30
 
-#define SYNC_DELAY_US (SYNC_LOW_DURATION - SYNC_INTERRUPT_OVERHEAD)
+/// Delay to try to jump the sync-low duration
+///#define SYNC_DELAY_US (SYNC_LOW_DURATION - SYNC_INTERRUPT_OVERHEAD)
 
 // Use a timer, rather than a delay loop, to provide sync delay. Recommended,
 // but limits total delay to 2000ms.

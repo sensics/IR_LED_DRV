@@ -421,6 +421,13 @@ INTERRUPT_HANDLER(TLI_IRQHandler, CAMERA_SYNC_IRQ_VECTOR)
   // test point output
   GPIO_WriteReverse(PORT_TESTPOINT_7, PIN_TESTPOINT_7);
 
+#ifdef WAIT_FOR_RISE
+  while (RESET == GPIO_ReadInputPin(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC))
+  {
+    // Spin until we read a high value on the sync pin again.
+  }
+#endif
+
 #ifdef ENABLE_SIMULATION
   // simulation timer restart
   TIM2_SetCounter(0);
