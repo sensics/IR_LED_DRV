@@ -22,7 +22,7 @@
 #include "Config.h"
 
 /// Enable development options
-#define ENABLE_DEV
+//#define ENABLE_DEV
 
 /// running patterns even when no sync arrives.
 #define ENABLE_SIMULATION
