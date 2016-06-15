@@ -103,7 +103,7 @@
 /// How long to wait after the end of the LED process before accepting a new sync interrupt?
 #define FLASH_SYNC_LOCKOUT_PERIOD 1000
 
-/// Simulation timer period, unknown units.
+/// Simulation timer period, milliseconds - how frequently a sync pulse will be "faked" in the absence of sync.
 #define SIMULATION_PERIOD 70
 
 /// We have a ~10ms frame, only let us schedule for 9ms of it for safety
