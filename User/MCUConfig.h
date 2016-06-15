@@ -100,8 +100,15 @@
 #define FLASH_DIM_PERIOD 20
 #endif
 
+/// How long to wait after the end of the LED process before accepting a new sync interrupt?
+#define FLASH_SYNC_LOCKOUT_PERIOD 1000
+
 /// Simulation timer period, unknown units.
 #define SIMULATION_PERIOD 70
+
+/// We have a ~10ms frame, only let us schedule for 9ms of it for safety
+/// This is used for an error check below only.
+#define MAX_TOTAL_DURATION 9000
 
 /// Timer value (microseconds) and thus the max value of any of the process timer periods.
 #define MAX_FLASH_PERIOD 8000
@@ -131,6 +138,7 @@
 
 #endif
 
+/// Check individual parameter bounds
 #if FLASH_BRIGHT_PERIOD <= MAX_FLASH_PERIOD_ADJUSTMENT || FLASH_BRIGHT_PERIOD >= MAX_FLASH_PERIOD
 #error "FLASH_BRIGHT_PERIOD out of range!"
 #endif
@@ -145,6 +153,20 @@
 #if SYNC_DELAY_TOTAL_US > MAX_FLASH_PERIOD
 #error "Total sync delay exceeds maximum possible for SYNC_DELAY_TIMER mode!"
 #endif
+#endif
+
+/// Check overall timing
+#ifdef SYNC_DELAY_TOTAL_US
+#define TOTAL_DURATION                                                                                                 \
+  (SYNC_DELAY_TOTAL_US + FLASH_BRIGHT_PERIOD + 5 * (FLASH_INTERVAL_PERIOD + FLASH_DIM_PERIOD) +                        \
+   FLASH_SYNC_LOCKOUT_PERIOD)
+#else
+#define TOTAL_DURATION                                                                                                 \
+  (FLASH_BRIGHT_PERIOD + 5 * (FLASH_INTERVAL_PERIOD + FLASH_DIM_PERIOD) + FLASH_SYNC_LOCKOUT_PERIOD)
+#endif
+
+#if (TOTAL_DURATION) > MAX_TOTAL_DURATION
+#error "The total timer duration exceeds the available time!"
 #endif
 
 /// Ports and pins

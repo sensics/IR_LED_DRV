@@ -156,7 +156,9 @@ typedef enum {
   STATE_BETWEEN_PULSES_AWAITING_TIMER,
   /// All off except a single byte of LEDs, for dim illumination
   STATE_DIM_PULSE_ON,
-  /// All dim illumination cycles completed, awaiting pattern illumination.
+  /// Lockout spurious sync signals following LED process
+  STATE_POST_PROCESS_LOCKOUT,
+  /// All dim illumination cycles and lockout completed, awaiting pattern illumination.
   STATE_AWAITING_PATTERN
 } State_t;
 
@@ -306,7 +308,23 @@ static void flash_process_start()
 // FLASH   _---_--_--_--_--_--____
 // B       ____-__-__-__-__-______
 // P       ___________________-___
+static void finishLEDProcess()
+{
 
+  // Disable this timer
+  TIM1_Cmd(DISABLE);
+
+  // Next time timer is enabled, use flash period as counter.
+  TIM1_SetCounter(_flash_period_as_timer);
+
+  // enable external interrupt on sync pin (floating)
+  // GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
+  enable_sync_interrupt();
+
+  // allow new pattern to be written to LEDs
+  _procState = STATE_AWAITING_PATTERN;
+  _subState  = 0;
+}
 // called by hardware timer (process timer)
 INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
 {
@@ -342,22 +360,17 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
     }
     else
     {
-      // Disable this timer
-      TIM1_Cmd(DISABLE);
-
-      // Next time timer is enabled, use flash period as counter.
-      TIM1_SetCounter(_flash_period_as_timer);
-
-      // enable external interrupt on sync pin (floating)
-      // GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
-      enable_sync_interrupt();
-
-      // allow new pattern to be written to LEDs
-      _procState = STATE_AWAITING_PATTERN;
-      _subState  = 0;
+      // OK, we've done all the sub-states, now we just lock out of sync for a while before finally exiting.
+      _procState = STATE_POST_PROCESS_LOCKOUT;
+      TIM1_SetCounter(MAX_FLASH_PERIOD - FLASH_SYNC_LOCKOUT_PERIOD);
     }
   }
   break;
+  case STATE_POST_PROCESS_LOCKOUT:
+    // OK, we've waited a safe period after completing our activities. We may now "finish up" and re-enable sync
+    // interrupts, etc.
+    finishLEDProcess();
+    break;
   case STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD:
 // shouldn't get here!
 // it means we couldn't get around to uploading the pattern before the timer went off
