@@ -56,9 +56,9 @@
 #endif
 
 /// Delay (msec) at the beginning of of the flash process
-//#define SYNC_DELAY_MS 0
+#define SYNC_DELAY_MS 5
 /// Delay (usec, <1000) at the beginning of of the flash process
-//#define SYNC_DELAY_US 30
+#define SYNC_DELAY_US 500
 
 /// Delay to try to jump the sync-low duration
 ///#define SYNC_DELAY_US (SYNC_LOW_DURATION - SYNC_INTERRUPT_OVERHEAD)
