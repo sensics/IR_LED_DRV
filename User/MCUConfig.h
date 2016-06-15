@@ -103,7 +103,8 @@
 /// Simulation timer period, unknown units.
 #define SIMULATION_PERIOD 70
 
-#define MAX_FLASH_PERIOD 2000
+/// Timer value (microseconds) and thus the max value of any of the process timer periods.
+#define MAX_FLASH_PERIOD 8000
 
 #ifdef OSVR_IR_IAR_STM8
 /// Offset taken (reducing timer duration) to account for computational overhead
