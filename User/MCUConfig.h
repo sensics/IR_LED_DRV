@@ -113,7 +113,7 @@
 
 #define FLASH_BRIGHT_PERIOD 150
 #define FLASH_INTERVAL_PERIOD 100
-#define FLASH_DIM_PERIOD 20
+#define FLASH_DIM_PERIOD 30
 #endif
 
 /// How long to wait after the end of the LED process before accepting a new sync interrupt?
