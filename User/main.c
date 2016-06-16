@@ -511,6 +511,12 @@ void set_interval_simulator(uint8_t simulation_period_time_ms)
 #endif // ENABLE_SIMULATION
 }
 
+extern const char BUILD_DESC[];
+
+#if defined(OSVR_IR_IAR_STM8)
+// Ensures the build description string is included.
+#pragma required=BUILD_DESC
+#endif // IAR STM8
 void main(void)
 {
   CLK_DeInit();

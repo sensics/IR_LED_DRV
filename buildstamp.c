@@ -25,12 +25,13 @@
 
 #define S_IMPL(X) #X
 #define S(X) S_IMPL(X)
-const char DESC[] =
-    "Sensics IR_LED_DRV "
+extern const char BUILD_DESC[] =
+    "[Sensics IR_LED_DRV "
 #ifdef PRODUCTION
     "(PRODUCTION)"
 #else
     "(DEV BUILD)"
 #endif
     " Built " __DATE__ " " __TIME__ ".Delay:" S(SYNC_DELAY_TOTAL_US) ",Bright:" S(FLASH_BRIGHT_PERIOD) ",Interval:" S(
-        FLASH_INTERVAL_PERIOD) ",Dim:" S(FLASH_DIM_PERIOD) ",Lockout:" S(FLASH_SYNC_LOCKOUT_PERIOD);
+        FLASH_INTERVAL_PERIOD) ",Dim:" S(FLASH_DIM_PERIOD) ",Lockout"
+                                                           ":" S(FLASH_SYNC_LOCKOUT_PERIOD) "]";
