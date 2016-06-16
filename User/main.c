@@ -47,19 +47,7 @@
 #endif
 
 #define MCU_CLOCK 16000000
-uint8_t index_16 = 15;
-
-/// @name Timer 1 values
-/// @brief Units are microseconds. Total time for a flash process, roughly
-/// _flash_period + 5 * _flash_blank_period + 5 *
-/// _flash_interval_period
-/// @{
-
-uint16_t _flash_blank_period    = FLASH_DIM_PERIOD;      // max 2000
-uint16_t _flash_interval_period = FLASH_INTERVAL_PERIOD; // max 2000
-uint16_t _flash_period          = FLASH_BRIGHT_PERIOD;   // max 2000
-
-/// @}
+static uint8_t index_16 = 15;
 
 static void Delay(uint16_t n)
 {
@@ -162,9 +150,9 @@ typedef enum {
   STATE_AWAITING_PATTERN
 } State_t;
 
-State_t _procState = STATE_PROCESS_AWAITING_START;
+static State_t _procState = STATE_PROCESS_AWAITING_START;
 
-uint8_t _subState = 0;
+static uint8_t _subState = 0;
 
 static void Send_blanks_spi_data()
 {
@@ -194,9 +182,20 @@ static void Send_blanks_spi_data()
   GPIO_WriteHigh(PORT_LATCH, PIN_LATCH);
 }
 
-uint16_t _flash_blank_period_as_timer;
-uint16_t _flash_interval_period_as_timer;
-uint16_t _flash_period_as_timer;
+/// @name Timer 1 values
+/// @brief Units are microseconds. Total time for a flash process, roughly
+/// _flash_period + 5 * _flash_blank_period + 5 *
+/// _flash_interval_period
+/// @{
+
+static uint16_t _flash_blank_period;
+static uint16_t _flash_interval_period;
+static uint16_t _flash_period;
+
+/// @}
+static uint16_t _flash_blank_period_as_timer;
+static uint16_t _flash_interval_period_as_timer;
+static uint16_t _flash_period_as_timer;
 
 /// Set duration (starting from "start" or "sync signal" starting flash process)
 /// of initial (pattern-based) LED flash
@@ -222,6 +221,10 @@ void set_interval_period(uint16_t period)
   _flash_interval_period          = period;
   _flash_interval_period_as_timer = MAX_FLASH_PERIOD - (_flash_interval_period - MAX_INTERVAL_PERIOD_ADJUSTMENT);
 }
+
+uint16_t get_flash_period() { return _flash_period; }
+uint16_t get_blank_period() { return _flash_blank_period; }
+uint16_t get_interval_period() { return _flash_interval_period; }
 
 void actuallyStartFlashProcess();
 
@@ -410,11 +413,11 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
   GPIO_WriteLow(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 }
 
-uint8_t _simulation_period = SIMULATION_PERIOD;
+static uint8_t _simulation_period;
 
 #ifdef ENABLE_SIMULATION
 
-static int8_t _simulation_in_process = 0;
+static uint8_t _simulation_in_process = 0;
 // called by hardware timer (simulated sync signal)
 INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, ITC_IRQ_TIM2_OVF)
 {
@@ -497,12 +500,12 @@ void set_interval_simulator(uint8_t simulation_period_time_ms)
   disableInterrupts();
 
   TIM2_Cmd(DISABLE);
-
+  _simulation_period = simulation_period_time_ms;
   //    #define SIM_TIME     70 // in milliseconds
   //    #define TIM2_PERIOD  ((MCU_CLOCK / 128) * SIM_TIME / 1000)
   //    TIM2_TimeBaseInit( TIM2_PRESCALER_128, TIM2_PERIOD );
 
-  TIM2_TimeBaseInit(TIM2_PRESCALER_128, (MCU_CLOCK / 128) * simulation_period_time_ms / 1000);
+  TIM2_TimeBaseInit(TIM2_PRESCALER_128, (MCU_CLOCK / 128) * _simulation_period / 1000);
   TIM2_ClearFlag(TIM2_FLAG_UPDATE);
   TIM2_ITConfig(TIM2_IT_UPDATE, ENABLE);
 
@@ -510,6 +513,8 @@ void set_interval_simulator(uint8_t simulation_period_time_ms)
   enableInterrupts();
 #endif // ENABLE_SIMULATION
 }
+
+uint8_t get_simulation_period() { return _simulation_period; }
 
 extern const char BUILD_DESC[];
 
@@ -565,7 +570,8 @@ void main(void)
 
   // Init external IRQ
   GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, GPIO_MODE_IN_FL_IT);
-  // GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, /*GPIO_MODE_IN_FL_IT*/ GPIO_MODE_IN_PU_IT);
+  // GPIO_Init(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, /*GPIO_MODE_IN_FL_IT*/
+  // GPIO_MODE_IN_PU_IT);
   // GPIO_ExternalPullUpConfig(PORT_CAMERA_SYNC, PIN_CAMERA_SYNC, ENABLE);
   disableInterrupts();
 #ifdef TRIGGER_ON_RISE
@@ -592,14 +598,14 @@ void main(void)
 
   default_array_init();
 
-  set_flash_period(_flash_period);
-  set_blank_period(_flash_blank_period);
-  set_interval_period(_flash_interval_period);
+  set_flash_period(FLASH_BRIGHT_PERIOD);
+  set_blank_period(FLASH_DIM_PERIOD);
+  set_interval_period(FLASH_INTERVAL_PERIOD);
 
   set_flash_timer_max_period(MAX_FLASH_PERIOD);
   TIM1_SetCounter(_flash_period_as_timer);
 
-  set_interval_simulator(_simulation_period);
+  set_interval_simulator(SIMULATION_PERIOD);
 
   index_16 = 0;
 

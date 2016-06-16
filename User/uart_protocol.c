@@ -16,6 +16,7 @@
 
 /* Internal Includes */
 #include "uart_protocol.h"
+#include "main.h"
 #include "array_init.h"
 
 /* Library/third-party includes */
@@ -322,21 +323,6 @@ static bool parseHexUint16(ConstCharPtr str, uint16_t *out)
   return TRUE;
 }
 
-extern uint8_t _simulation_period;
-extern uint16_t _flash_period;
-extern uint16_t _flash_blank_period;
-extern uint16_t _flash_interval_period;
-
-void set_flash_period(uint16_t period);
-void set_blank_period(uint16_t period);
-void set_interval_period(uint16_t period);
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// void set_flash_pulse_width(uint16_t flash_time_us);
-void set_interval_simulator(uint8_t simulation_period_time_ms);
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -375,7 +361,8 @@ void protocol_parse_flash_read()
   protocol_put_output_byte(UART_COMMAND_FLASH);
   protocol_put_output_byte(UART_MODE_READ);
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
-  protocol_put_hex_uint16(_flash_period);
+  uint16_t period = get_flash_period();
+  protocol_put_hex_uint16(period);
   protocol_put_output_byte(UART_CHARACTER_EOL);
   protocol_put_output_byte(UART_CHARACTER_NEWLINE);
 }
@@ -418,7 +405,8 @@ void protocol_parse_blank_read()
   protocol_put_output_byte(UART_COMMAND_BLANK);
   protocol_put_output_byte(UART_MODE_READ);
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
-  protocol_put_hex_uint16(_flash_blank_period);
+  uint16_t period = get_blank_period();
+  protocol_put_hex_uint16(period);
   protocol_put_output_byte(UART_CHARACTER_EOL);
   protocol_put_output_byte(UART_CHARACTER_NEWLINE);
 }
@@ -462,7 +450,8 @@ void protocol_parse_interval_read()
   protocol_put_output_byte(UART_COMMAND_INTERVAL);
   protocol_put_output_byte(UART_MODE_READ);
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
-  protocol_put_hex_uint16(_flash_interval_period);
+  uint16_t period = get_interval_period();
+  protocol_put_hex_uint16(period);
   protocol_put_output_byte(UART_CHARACTER_EOL);
   protocol_put_output_byte(UART_CHARACTER_NEWLINE);
 }
@@ -490,9 +479,7 @@ void protocol_parse_sim_write()
     return;
   }
 
-  _simulation_period = value;
-
-  set_interval_simulator(_simulation_period);
+  set_interval_simulator(value);
 
   protocol_parse_sim_read();
 }
@@ -508,7 +495,8 @@ void protocol_parse_sim_read()
   protocol_put_output_byte(UART_COMMAND_SIMULATION);
   protocol_put_output_byte(UART_MODE_READ);
   protocol_put_output_byte(UART_CHARACTER_DELIMITER);
-  protocol_put_hex_uint8(_simulation_period);
+  uint8_t period = get_simulation_period();
+  protocol_put_hex_uint8(period);
   protocol_put_output_byte(UART_CHARACTER_EOL);
   protocol_put_output_byte(UART_CHARACTER_NEWLINE);
 }
