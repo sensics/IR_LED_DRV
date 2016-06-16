@@ -30,14 +30,12 @@
 #endif
 
 /// Warnings related to dev and production.
-#ifdef ENABLE_DEV
+#ifdef PRODUCTION
 // If not in IAR, must skip this warning, since we might actually be in GCC generating input for ctags in ST Visual Develop,
 // and there's no way to distinguish the two environments :-/
 #ifdef OSVR_IR_IAR_STM8
-#warning "Development build!"
 #endif
 
-#else
 // This should be a production build.
 #ifdef SYNC_INTERVAL
 #error "SYNC_INTERVAL cannot be defined in a production build!"
@@ -90,7 +88,8 @@ static inline void delay_ticks(unsigned short ticks)
   }
 }
 #ifdef __ICCSTM8__
-// suppress "never referenced" diagnostic for these delay functions - they get used depending on the config.
+// suppress "never referenced" diagnostic for these delay functions - they get
+// used depending on the config.
 #pragma diag_suppress = Pe177
 #endif // __ICCSTM8__
 static void delay_us(unsigned short usec) { delay_ticks(USEC_TO_TICKS(usec)); }
@@ -158,7 +157,8 @@ typedef enum {
   STATE_DIM_PULSE_ON,
   /// Lockout spurious sync signals following LED process
   STATE_POST_PROCESS_LOCKOUT,
-  /// All dim illumination cycles and lockout completed, awaiting pattern illumination.
+  /// All dim illumination cycles and lockout completed, awaiting pattern
+  /// illumination.
   STATE_AWAITING_PATTERN
 } State_t;
 
@@ -246,7 +246,8 @@ static inline void actuallyStartFlashProcess()
 }
 
 void enable_sync_interrupt();
-/// Requires that you've already used GPIO_Init to do the overall, full pin setup: this just flips one bit to enable the
+/// Requires that you've already used GPIO_Init to do the overall, full pin
+/// setup: this just flips one bit to enable the
 /// external interrupt, which is much (over 10usec) faster.
 static inline void enable_sync_interrupt()
 {
@@ -256,7 +257,8 @@ static inline void enable_sync_interrupt()
 
 void disable_sync_interrupt();
 
-/// Requires that you've already used GPIO_Init to do the overall, full pin setup: this just flips one bit to disable
+/// Requires that you've already used GPIO_Init to do the overall, full pin
+/// setup: this just flips one bit to disable
 /// the external interrupt, which is much (over 10usec) faster.
 static inline void disable_sync_interrupt()
 {
@@ -328,7 +330,8 @@ static void finishLEDProcess()
 // called by hardware timer (process timer)
 INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
 {
-  // Pull test point high to signal entry into the process timer interrupt handler.
+  // Pull test point high to signal entry into the process timer interrupt
+  // handler.
   GPIO_WriteHigh(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 
   // Disable this timer to avoid counting while we set it.
@@ -360,21 +363,24 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
     }
     else
     {
-      // OK, we've done all the sub-states, now we just lock out of sync for a while before finally exiting.
+      // OK, we've done all the sub-states, now we just lock out of sync for a
+      // while before finally exiting.
       _procState = STATE_POST_PROCESS_LOCKOUT;
       TIM1_SetCounter(MAX_FLASH_PERIOD - FLASH_SYNC_LOCKOUT_PERIOD);
     }
   }
   break;
   case STATE_POST_PROCESS_LOCKOUT:
-    // OK, we've waited a safe period after completing our activities. We may now "finish up" and re-enable sync
+    // OK, we've waited a safe period after completing our activities. We may
+    // now "finish up" and re-enable sync
     // interrupts, etc.
     finishLEDProcess();
     break;
   case STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD:
 // shouldn't get here!
-// it means we couldn't get around to uploading the pattern before the timer went off
-#ifdef ENABLE_DEV
+// it means we couldn't get around to uploading the pattern before the timer
+// went off
+#ifndef PRODUCTION
     assert_param(_procState != STATE_BETWEEN_PULSES_AWAITING_BLANK_UPLOAD);
 #else
     // Wait some more.
@@ -399,7 +405,8 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, ITC_IRQ_TIM1_OVF)
   }
 #endif
 
-  // Bring test point low to signal completion of the process timer interrupt handler.
+  // Bring test point low to signal completion of the process timer interrupt
+  // handler.
   GPIO_WriteLow(PORT_TESTPOINT_10, PIN_TESTPOINT_10);
 }
 
@@ -483,11 +490,6 @@ static void set_flash_timer_max_period(uint16_t flash_time_us)
   // TIM1_Cmd(ENABLE);
   enableInterrupts();
 }
-
-// void set_flash_next_interrupt_time( uint16_t flash_time_us )
-//{
-//      TIM1_SetCounter(MAX_FLASH_PERIOD - flash_time_us);
-//}
 
 void set_interval_simulator(uint8_t simulation_period_time_ms)
 {

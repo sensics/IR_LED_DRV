@@ -21,9 +21,6 @@
 
 #include "Config.h"
 
-/// Enable development options
-//#define ENABLE_DEV
-
 /// running patterns even when no sync arrives.
 #define ENABLE_SIMULATION
 
@@ -55,18 +52,36 @@
 #error "Can't both trigger on rise and wait for rise - only one method of timing to rise can be used at once."
 #endif
 
-/// Delay (msec) at the beginning of of the flash process
-#define SYNC_DELAY_MS 5
-/// Delay (usec, <1000) at the beginning of of the flash process
-#define SYNC_DELAY_US 500
+/// Delay (msec) at the beginning of of the flash process - must use these split-apart versions if you're not using
+/// SYNC_DELAY_TIMER
+//#define SYNC_DELAY_MS 5
+
+/// Delay (usec, <1000) at the beginning of of the flash process - must use these split-apart versions if you're not
+/// using SYNC_DELAY_TIMER
+//#define SYNC_DELAY_US 500
+
+/// Delay (usec) at the beginning of the flash process - only advisable to use this combined version if you're also
+/// setting SYNC_DELAY_TIMER. If you define this manually, don't define the other two.
+#define SYNC_DELAY_TOTAL_US 5500
+
+#ifdef SYNC_DELAY_TOTAL_US
+#undef SYNC_DELAY_MS
+#undef SYNC_DELAY_US
+#endif
 
 /// Delay to try to jump the sync-low duration
 ///#define SYNC_DELAY_US (SYNC_LOW_DURATION - SYNC_INTERRUPT_OVERHEAD)
 
 // Use a timer, rather than a delay loop, to provide sync delay. Recommended,
-// but limits total delay to 2000ms.
+// but limits total delay to 8000ms.
 #define SYNC_DELAY_TIMER
 
+#if defined(SYNC_DELAY_TOTAL_US) && !defined(SYNC_DELAY_TIMER)
+#error                                                                                                                 \
+    "Manually specifying only a SYNC_DELAY_TOTAL_US, rather than split apart us and ms, requires setting SYNC_DELAY_TIMER!"
+#endif
+
+#ifndef SYNC_DELAY_TOTAL_US
 #if defined(SYNC_DELAY_MS) && defined(SYNC_DELAY_US)
 #define SYNC_DELAY_TOTAL_US (SYNC_DELAY_US + SYNC_DELAY_MS * 1000)
 #elif defined(SYNC_DELAY_MS)
@@ -74,6 +89,7 @@
 #elif defined(SYNC_DELAY_US)
 #define SYNC_DELAY_TOTAL_US (SYNC_DELAY_US)
 #endif
+#endif // !SYNC_DELAY_TOTAL_US
 
 /// For testing, only run the process every SYNC_INTERVAL sync pulses.
 //#define SYNC_INTERVAL 3
