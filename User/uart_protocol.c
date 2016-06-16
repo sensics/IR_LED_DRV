@@ -236,10 +236,10 @@ static void protocol_put_hex_uint16(uint16_t val)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void protocol_output_error(uint8_t *info, uint8_t info_length)
 {
-  uint8_t space_availible = UART_MAX_WRITE_LENGTH - _write_buffer.count;
+  uint8_t space_available = UART_MAX_WRITE_LENGTH - _write_buffer.count;
 
   // if overflow
-  if (space_availible < info_length + 3) // "E:xxxxx\n"
+  if (space_available < info_length + 3) // "E:xxxxx\n"
     return;
 
   protocol_put_output_byte(UART_COMMAND_ERROR);
@@ -254,10 +254,10 @@ void protocol_output_error(uint8_t *info, uint8_t info_length)
 
 void protocol_output_string(uint8_t *info, uint8_t info_length)
 {
-  uint8_t space_availible = UART_MAX_WRITE_LENGTH - _write_buffer.count;
+  uint8_t space_available = UART_MAX_WRITE_LENGTH - _write_buffer.count;
 
   // if overflow
-  if (space_availible < info_length) // "E:xxxxx\n"
+  if (space_available < info_length) // "E:xxxxx\n"
     return;
 
   while (info_length--)
@@ -360,21 +360,16 @@ void protocol_parse_flash_write()
     return;
   }
 
-  //_flash_period = value;
-  //_flash_period_as_timer          = MAX_FLASH_PERIOD - _flash_period -
-  // MAX_FLASH_PERIOD_ADJUSTMENT;
   set_flash_period(value);
-  //  set_flash_pulse_width(_flash_period);
-
   protocol_parse_flash_read();
 }
 
 void protocol_parse_flash_read()
 {
-  uint8_t space_availible = UART_MAX_WRITE_LENGTH - _write_buffer.count;
+  uint8_t space_available = UART_MAX_WRITE_LENGTH - _write_buffer.count;
 
   // if overflow
-  if (space_availible < 8) // "FR:0010\n"
+  if (space_available < 8) // "FR:0010\n"
     return;
 
   protocol_put_output_byte(UART_COMMAND_FLASH);
@@ -414,10 +409,10 @@ void protocol_parse_blank_write()
 
 void protocol_parse_blank_read()
 {
-  uint8_t space_availible = UART_MAX_WRITE_LENGTH - _write_buffer.count;
+  uint8_t space_available = UART_MAX_WRITE_LENGTH - _write_buffer.count;
 
   // if overflow
-  if (space_availible < 8) // "FR:0010\n"
+  if (space_available < 8) // "FR:0010\n"
     return;
 
   protocol_put_output_byte(UART_COMMAND_BLANK);
@@ -458,10 +453,10 @@ void protocol_parse_interval_write()
 
 void protocol_parse_interval_read()
 {
-  uint8_t space_availible = UART_MAX_WRITE_LENGTH - _write_buffer.count;
+  uint8_t space_available = UART_MAX_WRITE_LENGTH - _write_buffer.count;
 
   // if overflow
-  if (space_availible < 8) // "FR:0010\n"
+  if (space_available < 8) // "FR:0010\n"
     return;
 
   protocol_put_output_byte(UART_COMMAND_INTERVAL);
@@ -504,10 +499,10 @@ void protocol_parse_sim_write()
 
 void protocol_parse_sim_read()
 {
-  uint8_t space_availible = UART_MAX_WRITE_LENGTH - _write_buffer.count;
+  uint8_t space_available = UART_MAX_WRITE_LENGTH - _write_buffer.count;
 
   // if overflow
-  if (space_availible < 6) // "SR:10\n"
+  if (space_available < 6) // "SR:10\n"
     return;
 
   protocol_put_output_byte(UART_COMMAND_SIMULATION);
@@ -563,7 +558,7 @@ void protocol_parse_pattern_write()
 
 void protocol_parse_pattern_read()
 {
-  uint8_t space_availible = UART_MAX_WRITE_LENGTH - _write_buffer.count;
+  uint8_t space_available = UART_MAX_WRITE_LENGTH - _write_buffer.count;
 
   if (_protocol_line[2] != UART_CHARACTER_DELIMITER)
   {
@@ -579,7 +574,7 @@ void protocol_parse_pattern_read()
   }
 
   // if overflow
-  if (space_availible < 20) // "PR:1:00,01,02,03,04\n"
+  if (space_available < 20) // "PR:1:00,01,02,03,04\n"
     return;
 
   protocol_put_output_byte(UART_COMMAND_PATTERN);
