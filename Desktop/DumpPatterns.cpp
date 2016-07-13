@@ -15,6 +15,7 @@
 // Internal Includes
 #include "array_init.h"
 #include "PatternString.h"
+#include "BeaconOrder.h"
 
 // Library/third-party includes
 #include <json/value.h>
@@ -26,11 +27,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
-static const auto TARGET0_BEACON_ORDER = {
-    5,  6,  3,  4,  1,  2,  10, 8,  9,  7,  11, 28, 27, 25, 15, 16, 17,
-    18, 19, 20, 21, 22, 23, 24, 14, 26, 13, 12, 29, 30, 31, 32, 33, 34};
-static const auto TARGET1_BEACON_ORDER = {37, 38, 39, 40, 33, 34};
 
 int main() {
   default_array_init();
