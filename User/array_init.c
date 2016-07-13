@@ -26,6 +26,8 @@
 /* - none - */
 
 // clang-format off
+EEPROM uint8_t default_mask[LED_LINE_LENGTH] = {0xff, 0xff, 0xff, 0xff, 0xff};
+
 #if 1
 EEPROM uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
 {
@@ -74,33 +76,43 @@ NEAR uint8_t pattern_array[PATTERN_COUNT][LED_LINE_LENGTH];
 
 NEAR uint8_t ir_led_driver_buffer[PATTERN_COUNT][DRIVER_BUFFER_LENGTH];
 
-void line_array_init(uint8_t index, uint8_t *value)
+NEAR uint8_t driver_mask[DRIVER_BUFFER_LENGTH];
+
+void expand_array(uint8_t *buffer, uint8_t *value)
 {
+
   uint8_t j, k;
   for (j = 0, k = 0; j < LED_LINE_LENGTH; j++)
   {
-    ir_led_driver_buffer[index][k] = 0;
+    // Process an entire byte of value, bit by bit, within this single loop body.
+    // This means we will touch two bytes of buffer.
+
+    // 0x03 is adjacent bits on: 0b00000011
+
+    buffer[k] = 0;
     if (value[j] & 0x01)
-      ir_led_driver_buffer[index][k] |= (0x03 << 0);
+      buffer[k] |= (0x03 << 0);
     if (value[j] & 0x02)
-      ir_led_driver_buffer[index][k] |= (0x03 << 2);
+      buffer[k] |= (0x03 << 2);
     if (value[j] & 0x04)
-      ir_led_driver_buffer[index][k] |= (0x03 << 4);
+      buffer[k] |= (0x03 << 4);
     if (value[j] & 0x08)
-      ir_led_driver_buffer[index][k] |= (0x03 << 6);
+      buffer[k] |= (0x03 << 6);
     k++;
-    ir_led_driver_buffer[index][k] = 0;
+    buffer[k] = 0;
     if (value[j] & 0x10)
-      ir_led_driver_buffer[index][k] |= (0x03 << 0);
+      buffer[k] |= (0x03 << 0);
     if (value[j] & 0x20)
-      ir_led_driver_buffer[index][k] |= (0x03 << 2);
+      buffer[k] |= (0x03 << 2);
     if (value[j] & 0x40)
-      ir_led_driver_buffer[index][k] |= (0x03 << 4);
+      buffer[k] |= (0x03 << 4);
     if (value[j] & 0x80)
-      ir_led_driver_buffer[index][k] |= (0x03 << 6);
+      buffer[k] |= (0x03 << 6);
     k++;
   }
 }
+
+void line_array_init(uint8_t index, uint8_t *value) { expand_array(ir_led_driver_buffer[index], value); }
 
 void default_array_init(void)
 {
@@ -113,5 +125,14 @@ void default_array_init(void)
       pattern_array[i][j] = default_pattern_array[i][j];
     }
     line_array_init(i, (uint8_t *)pattern_array[i]);
+  }
+  {
+    uint8_t mask[LED_LINE_LENGTH];
+    uint8_t j;
+    for (j = 0; j < LED_LINE_LENGTH; j++)
+    {
+      mask[j] = default_mask[j];
+    }
+    expand_array(driver_mask, mask);
   }
 }

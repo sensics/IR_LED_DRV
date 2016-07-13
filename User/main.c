@@ -115,13 +115,15 @@ static void Send_array_spi_data()
   SPI_SendByte((uint8_t)0x00); // for 96 bit EVB
   SPI_SendByte((uint8_t)0x00); // for 96 bit EVB
 
-  uint8_t *ptr = ir_led_driver_buffer[index_16];
-  uint8_t k    = DRIVER_BUFFER_LENGTH;
+  uint8_t *ptr     = ir_led_driver_buffer[index_16];
+  uint8_t *maskptr = driver_mask;
+  uint8_t k        = DRIVER_BUFFER_LENGTH;
   while (k)
   {
     k--;
-    SPI_SendByte(*ptr);
+    SPI_SendByte((*ptr) & (*maskptr));
     ptr++;
+    maskptr++;
   }
 
   /// Wait for transmission to complete.
@@ -167,8 +169,8 @@ static void Send_blanks_spi_data()
     {
       /// @todo For one "blank" interval per process, each LED is illuminated,
       /// to provide "dim" - is this correct understanding?
-      SPI_SendByte((uint8_t)0xFF);
-      SPI_SendByte((uint8_t)0xFF);
+      SPI_SendByte((uint8_t)driver_mask[i * 2]);
+      SPI_SendByte((uint8_t)driver_mask[i * 2 + 1]);
     }
     else
     {
@@ -520,7 +522,7 @@ extern const char BUILD_DESC[];
 
 #if defined(OSVR_IR_IAR_STM8)
 // Ensures the build description string is included.
-#pragma required=BUILD_DESC
+#pragma required = BUILD_DESC
 #endif // IAR STM8
 void main(void)
 {
