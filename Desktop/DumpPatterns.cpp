@@ -13,9 +13,8 @@
 // All rights reserved.
 
 // Internal Includes
-extern "C" {
 #include "array_init.h"
-};
+#include "PatternString.h"
 
 // Library/third-party includes
 #include <json/value.h>
@@ -28,33 +27,10 @@ extern "C" {
 #include <string>
 #include <vector>
 
-static const auto BITS = 8;
-static const auto NUM_LEDS = LED_LINE_LENGTH * BITS;
-
 static const auto TARGET0_BEACON_ORDER = {
     5,  6,  3,  4,  1,  2,  10, 8,  9,  7,  11, 28, 27, 25, 15, 16, 17,
     18, 19, 20, 21, 22, 23, 24, 14, 26, 13, 12, 29, 30, 31, 32, 33, 34};
 static const auto TARGET1_BEACON_ORDER = {37, 38, 39, 40, 33, 34};
-bool getElementBit(uint8_t element, uint8_t *arr) {
-  auto byte = element / BITS;
-  auto bit = element % BITS;
-  return 0x0 != ((arr[byte]) & (0x01 << bit));
-}
-
-bool getBitFromPattern(int patternElement, int led) {
-  return getElementBit(static_cast<uint8_t>(led),
-                       pattern_array[patternElement]);
-}
-
-template <typename ArrayType>
-std::string getPatternString(int element, ArrayType arr) {
-  std::string ret;
-  auto elementIdx = static_cast<uint8_t>(element);
-  for (int pattElt = 0; pattElt < PATTERN_COUNT; ++pattElt) {
-    ret += (getElementBit(elementIdx, arr[pattElt]) ? "*" : ".");
-  }
-  return ret;
-}
 
 int main() {
   default_array_init();

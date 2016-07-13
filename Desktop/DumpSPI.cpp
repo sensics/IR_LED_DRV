@@ -13,9 +13,7 @@
 // All rights reserved.
 
 // Internal Includes
-extern "C" {
 #include "array_init.h"
-};
 
 // Library/third-party includes
 // - none
