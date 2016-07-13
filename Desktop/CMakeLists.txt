@@ -22,3 +22,9 @@ add_executable(DumpSPI
     DumpSPI.cpp
     "${USER_DIR}/array_init.c"
     "${USER_DIR}/array_init.h")
+
+
+add_executable(MatchPatterns
+    MatchPatterns.cpp
+    "${USER_DIR}/array_init.c"
+    "${USER_DIR}/array_init.h")
