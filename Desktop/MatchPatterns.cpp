@@ -103,7 +103,7 @@ static std::vector<std::string> OsvrHdkLedIdentifier_SENSOR0_PATTERNS = {
 /// @brief Determines the LED IDs for the OSVR HDK sensor 1 (back plate)
 /// These are from the as-built measurements.
 static std::vector<std::string> OsvrHdkLedIdentifier_SENSOR1_PATTERNS = {
-    "X............**.." // 37 31 // never actually turns on in production
+    "X*...........**.." // 37 31 // never actually turns on in production
     ,
     "......**.*......" // 38 32
     ,
