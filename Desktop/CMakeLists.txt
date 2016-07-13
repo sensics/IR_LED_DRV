@@ -23,8 +23,12 @@ add_executable(DumpSPI
     "${USER_DIR}/array_init.c"
     "${USER_DIR}/array_init.h")
 
-
 add_executable(MatchPatterns
     MatchPatterns.cpp
+    "${USER_DIR}/array_init.c"
+    "${USER_DIR}/array_init.h")
+
+add_executable(GenerateMask
+    GenerateMask.cpp
     "${USER_DIR}/array_init.c"
     "${USER_DIR}/array_init.h")
