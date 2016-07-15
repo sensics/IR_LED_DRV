@@ -58,8 +58,8 @@ struct BeaconAdjacentBright {
 };
 
 std::ostream &operator<<(std::ostream &os, BeaconAdjacentBright const &adj) {
-  os << "(" << adj.beaconA + 1 << ", " << adj.beaconB + 1 << ") @ "
-     << adj.patternStep << " [ " << std::sqrt(adj.squaredDistance) << "]";
+  os << "(" << adj.beaconA + 1 << "--" << adj.beaconB + 1 << ") @ "
+     << adj.patternStep << " [" << std::sqrt(adj.squaredDistance) << " mm]";
   return os;
 }
 
