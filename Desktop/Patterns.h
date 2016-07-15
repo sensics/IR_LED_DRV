@@ -33,8 +33,8 @@
 
 // Standard includes
 #include <algorithm>
-#include <vector>
 #include <string>
+#include <vector>
 
 /// These are from HDKLedIDentifierFactor.cpp
 
@@ -131,8 +131,7 @@ static const auto BRIGHT_CHAR = '*';
 
 const auto NUM_LEDS_SENSOR0 = OsvrHdkLedIdentifier_SENSOR0_PATTERNS.size();
 
-const auto PATTERN_LENGTH = OsvrHdkLedIdentifier_SENSOR0_PATTERNS.back()
-                                .length(); // the back LED is enabled.
+const auto PATTERN_LENGTH = OsvrHdkLedIdentifier_SENSOR0_PATTERNS.back().length(); // the back LED is enabled.
 
 void initPatterns() {
   auto cleanPattern = [](std::string const &inString) {
@@ -141,11 +140,9 @@ void initPatterns() {
     }
     return inString;
   };
-  std::transform(begin(OsvrHdkLedIdentifier_SENSOR0_PATTERNS),
-                 end(OsvrHdkLedIdentifier_SENSOR0_PATTERNS),
+  std::transform(begin(OsvrHdkLedIdentifier_SENSOR0_PATTERNS), end(OsvrHdkLedIdentifier_SENSOR0_PATTERNS),
                  begin(OsvrHdkLedIdentifier_SENSOR0_PATTERNS), cleanPattern);
-  std::transform(begin(OsvrHdkLedIdentifier_SENSOR1_PATTERNS),
-                 end(OsvrHdkLedIdentifier_SENSOR1_PATTERNS),
+  std::transform(begin(OsvrHdkLedIdentifier_SENSOR1_PATTERNS), end(OsvrHdkLedIdentifier_SENSOR1_PATTERNS),
                  begin(OsvrHdkLedIdentifier_SENSOR1_PATTERNS), cleanPattern);
 }
 

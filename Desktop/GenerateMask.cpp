@@ -13,19 +13,19 @@
 // All rights reserved.
 
 // Internal Includes
-#include "array_init.h"
-#include "PatternString.h"
 #include "BeaconOrder.h"
+#include "PatternString.h"
+#include "array_init.h"
 
 // Library/third-party includes
 // - none
 
 // Standard includes
+#include <bitset>
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <bitset>
 
 using BeaconOrderContainer = std::vector<int>;
 
@@ -34,9 +34,7 @@ static const auto DISABLED_TARGET0_BEACONS = {27};
 
 static BeaconOrderContainer TargetOrder0;
 
-int oneBasedTarget0BeaconToFirmwareBit(int beacon) {
-  return TargetOrder0[beacon - 1];
-}
+int oneBasedTarget0BeaconToFirmwareBit(int beacon) { return TargetOrder0[beacon - 1]; }
 
 int main() {
   TargetOrder0.assign(begin(TARGET0_BEACON_ORDER), end(TARGET0_BEACON_ORDER));

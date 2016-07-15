@@ -16,22 +16,21 @@
 // All rights reserved.
 
 // Internal Includes
-#include "array_init.h"
 #include "PatternString.h"
 #include "Patterns.h"
+#include "array_init.h"
 
 // Library/third-party includes
 // - none
 
 // Standard includes
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
-#include <algorithm>
-#include <vector>
 #include <iterator>
+#include <vector>
 
-int findPattern(std::vector<std::string> const &patternList,
-                std::string const &pattern) {
+int findPattern(std::vector<std::string> const &patternList, std::string const &pattern) {
   auto it = std::find(begin(patternList), end(patternList), pattern);
   if (it == end(patternList)) {
     return -1;
@@ -51,28 +50,21 @@ void dumpBeaconOrder(int targetNum, std::vector<int> const &order) {
 int main() {
   default_array_init();
   initPatterns();
-  std::vector<int> targetOrder0(OsvrHdkLedIdentifier_SENSOR0_PATTERNS.size(),
-                                -1);
-  std::vector<int> targetOrder1(OsvrHdkLedIdentifier_SENSOR1_PATTERNS.size(),
-                                -1);
+  std::vector<int> targetOrder0(OsvrHdkLedIdentifier_SENSOR0_PATTERNS.size(), -1);
+  std::vector<int> targetOrder1(OsvrHdkLedIdentifier_SENSOR1_PATTERNS.size(), -1);
   for (int led = 0; led < NUM_LEDS; ++led) {
     auto patternString = getPatternString(led, pattern_array);
-    auto target0 =
-        findPattern(OsvrHdkLedIdentifier_SENSOR0_PATTERNS, patternString);
+    auto target0 = findPattern(OsvrHdkLedIdentifier_SENSOR0_PATTERNS, patternString);
     if (target0 < 0) {
-      auto target1 =
-          findPattern(OsvrHdkLedIdentifier_SENSOR1_PATTERNS, patternString);
+      auto target1 = findPattern(OsvrHdkLedIdentifier_SENSOR1_PATTERNS, patternString);
       if (target1 < 0) {
-        std::cout << "Could not find a match for firmware pattern " << led
-                  << ": " << patternString << std::endl;
+        std::cout << "Could not find a match for firmware pattern " << led << ": " << patternString << std::endl;
       } else {
-        std::cout << "Firmware pattern " << led << " is rear target pattern "
-                  << target1 << std::endl;
+        std::cout << "Firmware pattern " << led << " is rear target pattern " << target1 << std::endl;
         targetOrder1[target1] = led;
       }
     } else {
-      std::cout << "Firmware pattern " << led << " is front target pattern "
-                << target0 << std::endl;
+      std::cout << "Firmware pattern " << led << " is front target pattern " << target0 << std::endl;
       targetOrder0[target0] = led;
     }
   }

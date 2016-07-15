@@ -13,9 +13,9 @@
 // All rights reserved.
 
 // Internal Includes
-#include "array_init.h"
-#include "PatternString.h"
 #include "BeaconOrder.h"
+#include "PatternString.h"
+#include "array_init.h"
 
 // Library/third-party includes
 #include <json/value.h>
@@ -44,8 +44,8 @@ int main() {
     }
 #endif
   for (int led = 0; led < NUM_LEDS; ++led) {
-    std::cout << "pattern_array LED " << std::setw(2) << led << ": "
-              << getPatternString(led, pattern_array) << std::endl;
+    std::cout << "pattern_array LED " << std::setw(2) << led << ": " << getPatternString(led, pattern_array)
+              << std::endl;
   }
   std::cout << "\n\n";
 
@@ -53,8 +53,7 @@ int main() {
     Json::Value root;
     auto addBeacon = [&](int beaconId) {
       Json::Value beacon;
-      beacon[std::to_string(beaconId)] =
-          getPatternString(beaconId - 1, pattern_array);
+      beacon[std::to_string(beaconId)] = getPatternString(beaconId - 1, pattern_array);
       root.append(beacon);
     };
     for (auto beaconId : TARGET0_BEACON_ORDER) {
@@ -76,8 +75,8 @@ int main() {
   }
 
   for (int elt = 0; elt < 2 * NUM_LEDS; ++elt) {
-    std::cout << "ir_led_driver_buffer " << std::setw(2) << elt << ": "
-              << getPatternString(elt, ir_led_driver_buffer) << std::endl;
+    std::cout << "ir_led_driver_buffer " << std::setw(2) << elt << ": " << getPatternString(elt, ir_led_driver_buffer)
+              << std::endl;
   }
 
   return 0;

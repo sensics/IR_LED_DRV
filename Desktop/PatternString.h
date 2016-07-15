@@ -34,12 +34,10 @@ bool getElementBit(uint8_t element, uint8_t *arr) {
 }
 
 bool getBitFromPattern(int patternElement, int led) {
-  return getElementBit(static_cast<uint8_t>(led),
-                       pattern_array[patternElement]);
+  return getElementBit(static_cast<uint8_t>(led), pattern_array[patternElement]);
 }
 
-template <typename ArrayType>
-std::string getPatternString(int element, ArrayType arr) {
+template <typename ArrayType> std::string getPatternString(int element, ArrayType arr) {
   std::string ret;
   auto elementIdx = static_cast<uint8_t>(element);
   for (int pattElt = 0; pattElt < PATTERN_COUNT; ++pattElt) {
