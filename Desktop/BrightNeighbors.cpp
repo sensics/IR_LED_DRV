@@ -36,6 +36,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <tuple> // for std::tie to make comparisons simpler.
 
 using BeaconList = std::vector<int>;
 using Eigen::Vector3d;
@@ -79,6 +80,8 @@ public:
   }
 
   void endPatternStep() { moveBrightBeaconsToList(); }
+
+  /// Gets the list, lazily sorted if required, on demand
   AdjacentBrightnessList const &getSortedAdjacentBrightnessList() {
     if (!listSorted_) {
       sortAdjacentList();
@@ -92,10 +95,26 @@ private:
     brightBeacons_.clear();
   }
   void sortAdjacentList() {
-    std::sort(begin(adjacentBrightness_), end(adjacentBrightness_),
-              [](BeaconAdjacentBright const &a, BeaconAdjacentBright const &b) {
-                return a.squaredDistance < b.squaredDistance;
-              });
+
+#if 0
+    /// sort by distance, then by pattern step.
+    auto comparison = [](BeaconAdjacentBright const &a,
+                         BeaconAdjacentBright const &b) {
+      return a.squaredDistance < b.squaredDistance ||
+             (a.squaredDistance == b.squaredDistance &&
+              a.patternStep < b.patternStep);
+    };
+#else
+    /// sort by distance, then by pattern step.
+    auto comparison = [](BeaconAdjacentBright const &a,
+                         BeaconAdjacentBright const &b) {
+      return std::tie(a.squaredDistance, a.patternStep, a.beaconA, a.beaconB) <
+             std::tie(b.squaredDistance, b.patternStep, b.beaconA, b.beaconB);
+
+    };
+#endif
+
+    std::sort(begin(adjacentBrightness_), end(adjacentBrightness_), comparison);
     listSorted_ = true;
   }
   std::vector<BeaconList> brightBeaconsPerStep_;
