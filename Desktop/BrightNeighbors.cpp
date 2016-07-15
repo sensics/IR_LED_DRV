@@ -38,6 +38,11 @@
 #include <cmath>
 #include <tuple> // for std::tie to make comparisons simpler.
 
+/// These are beacons we've chosen to mask off or disable, typically based on
+/// the results from this tool.
+#define APPLY_MASK
+static const auto MASKED_ONEBASED_BEACONIDS = {5, 13, 16};
+
 using BeaconList = std::vector<int>;
 using Eigen::Vector3d;
 
@@ -126,21 +131,33 @@ private:
 
 int main() {
   initPatterns();
-#if 0
-  auto numLeds = static_cast<int>(OsvrHdkLedIdentifier_SENSOR0_PATTERNS.size());
-  auto patternLength =
-      static_cast<int>(OsvrHdkLedLocations_SENSOR0_PATTERNS.front().length());
-#else
+
   auto numLeds = static_cast<int>(NUM_LEDS_SENSOR0);
   auto patternLength = static_cast<int>(PATTERN_LENGTH);
+
+#ifdef APPLY_MASK
+  /// Replace the pattern in every "masked" LED with all dim for the purposes of
+  /// this tool.
+  auto maskString = std::string(PATTERN_LENGTH, '.');
+  for (auto &&maskId : MASKED_ONEBASED_BEACONIDS) {
+    OsvrHdkLedIdentifier_SENSOR0_PATTERNS[maskId - 1] = maskString;
+  }
 #endif
 
   BrightnessTracking brightness;
 
+  /// For each pattern step...
   for (int patternStep = 0; patternStep < patternLength; ++patternStep) {
+
     brightness.startPatternStep(patternStep);
+
+    /// go through each beacon...
     for (int ledNum = 0; ledNum < numLeds; ++ledNum) {
+
+      /// checking to see if it's bright
       if (OsvrHdkLedIdentifier_SENSOR0_PATTERNS[ledNum][patternStep] == '*') {
+        /// and if so, recording it with the brightness tracker (which takes
+        /// care of the pairwise comparison, etc)
         brightness.recordBrightBeacon(ledNum);
       }
     }
