@@ -14,21 +14,27 @@ include_directories("${USER_DIR}")
 
 add_executable(DumpPatterns
     DumpPatterns.cpp
+    PatternString.h
+    BeaconOrder.h
     "${USER_DIR}/array_init.c"
     "${USER_DIR}/array_init.h")
 target_link_libraries(DumpPatterns PRIVATE JsonCpp::JsonCpp)
 
 add_executable(DumpSPI
     DumpSPI.cpp
+    PatternString.h
     "${USER_DIR}/array_init.c"
     "${USER_DIR}/array_init.h")
 
 add_executable(MatchPatterns
     MatchPatterns.cpp
+    Patterns.h
+    PatternString.h
     "${USER_DIR}/array_init.c"
     "${USER_DIR}/array_init.h")
 
 add_executable(GenerateMask
     GenerateMask.cpp
+    BeaconOrder.h
     "${USER_DIR}/array_init.c"
     "${USER_DIR}/array_init.h")
