@@ -126,6 +126,9 @@ std::vector<std::string> OsvrHdkLedIdentifier_SENSOR1_PATTERNS = {
     "...**.....*....." // 34 28
 };
 
+static const auto DIM_CHAR = '.';
+static const auto BRIGHT_CHAR = '*';
+
 const auto NUM_LEDS_SENSOR0 = OsvrHdkLedIdentifier_SENSOR0_PATTERNS.size();
 
 const auto PATTERN_LENGTH = OsvrHdkLedIdentifier_SENSOR0_PATTERNS.back()
