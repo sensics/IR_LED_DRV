@@ -27,16 +27,13 @@
 #include <string>
 #include <vector>
 
-using BeaconOrderContainer = std::vector<int>;
-
 /// 1-based indices WRT the tracking software of beacons we'd like to disable.
-static const auto DISABLED_TARGET0_BEACONS = {27};
+static const auto DISABLED_TARGET0_BEACONS = {33, 13, 18, 32, 34, 5};
 
-static BeaconOrderContainer TargetOrder0;
+/// 1-based indices WRT the tracking software of the beacons on the rear that never light up anyway.
+static const auto DISABLED_TARGET1_BEACONS = {1, 4};
 
 static const int BITS_PER_BYTE = 8;
-
-int oneBasedTarget0BeaconToFirmwareBit(int beacon) { return TargetOrder0[beacon - 1]; }
 
 /// needs a bidirectional iterator
 template <typename Iterator> inline uint8_t byteFromBoolContainer(Iterator lsb) {
@@ -69,10 +66,14 @@ template <typename Container> inline uint8_t byteFromBoolContainerAtByte(Contain
 }
 
 int main() {
-  TargetOrder0.assign(begin(TARGET0_BEACON_ORDER), end(TARGET0_BEACON_ORDER));
   std::vector<bool> mask(NUM_LEDS, true);
   for (auto &beacon1based : DISABLED_TARGET0_BEACONS) {
     auto bit = oneBasedTarget0BeaconToFirmwareBit(beacon1based);
+    mask[bit] = false;
+  }
+
+  for (auto &beacon1based : DISABLED_TARGET1_BEACONS) {
+    auto bit = oneBasedTarget1BeaconToFirmwareBit(beacon1based);
     mask[bit] = false;
   }
 
