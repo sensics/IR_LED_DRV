@@ -1,5 +1,8 @@
 /** @file
-    @brief Implementation
+    @brief App used to determine the contents of BeaconOrder.h - the mapping
+   between the identification/order used for beacons in the trakcing software
+   and the order they're referred to in the firmware - by matching their
+   patterns.
 
     @date 2016
 

@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
 find_package(JsonCpp REQUIRED)
+find_package(Eigen3)
 
 set(USER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../User")
 include_directories("${USER_DIR}")
@@ -38,3 +39,11 @@ add_executable(GenerateMask
     BeaconOrder.h
     "${USER_DIR}/array_init.c"
     "${USER_DIR}/array_init.h")
+
+if(EIGEN3_FOUND)
+    add_executable(BrightNeighbors
+        BrightNeighbors.cpp
+        Patterns.h
+        Positions.h)
+    target_include_directories(BrightNeighbors PRIVATE ${EIGEN3_INCLUDE_DIR})
+endif()
