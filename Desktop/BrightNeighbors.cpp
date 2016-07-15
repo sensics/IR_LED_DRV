@@ -123,14 +123,6 @@ private:
     brightBeacons_.clear();
   }
   void sortAdjacentList() {
-#if 0
-    auto comparison = [](BeaconAdjacentBright const &a,
-                         BeaconAdjacentBright const &b) {
-      return std::tie(a.squaredDistance, a.patternStep, a.beaconA, a.beaconB) <
-             std::tie(b.squaredDistance, b.patternStep, b.beaconA, b.beaconB);
-
-    };
-#endif
     std::sort(begin(adjacentBrightness_), end(adjacentBrightness_));
     listSorted_ = true;
   }
