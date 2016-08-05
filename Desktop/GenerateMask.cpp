@@ -28,6 +28,7 @@
 #include <vector>
 
 /// 1-based indices WRT the tracking software of beacons we'd like to disable.
+/// Masked LEDs determined by BrightNeighbors using distance-cost method, 7 passes (6 LEDs).
 static const auto DISABLED_TARGET0_BEACONS = {33, 13, 18, 32, 34, 5};
 
 /// 1-based indices WRT the tracking software of the beacons on the rear that never light up anyway.
