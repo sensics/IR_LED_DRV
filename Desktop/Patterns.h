@@ -21,6 +21,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// SPDX-License-Identifier: Apache 2.0
 
 #ifndef INCLUDED_Patterns_h_GUID_7F4808CB_757C_4D82_2F6E_C10D805D686F
 #define INCLUDED_Patterns_h_GUID_7F4808CB_757C_4D82_2F6E_C10D805D686F

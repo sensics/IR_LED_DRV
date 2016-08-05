@@ -21,6 +21,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// SPDX-License-Identifier: Apache 2.0
 
 #ifndef INCLUDED_Positions_h_GUID_76FF5E5E_984A_429D_CD2D_7696286A97F8
 #define INCLUDED_Positions_h_GUID_76FF5E5E_984A_429D_CD2D_7696286A97F8

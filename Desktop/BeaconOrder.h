@@ -21,6 +21,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// SPDX-License-Identifier: Apache 2.0
 
 #ifndef INCLUDED_BeaconOrder_h_GUID_86CA83BB_03DE_49AF_D736_08498ABBC48C
 #define INCLUDED_BeaconOrder_h_GUID_86CA83BB_03DE_49AF_D736_08498ABBC48C
