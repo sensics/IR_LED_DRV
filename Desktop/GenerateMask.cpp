@@ -38,6 +38,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <climits>
 
 /// 1-based indices WRT the tracking software of beacons we'd like to disable.
 #if 0
@@ -59,15 +60,13 @@ static const auto DISABLED_TARGET0_BEACONS = {
 /// 1-based indices WRT the tracking software of the beacons on the rear that never light up anyway.
 static const auto DISABLED_TARGET1_BEACONS = {1, 4};
 
-static const int BITS_PER_BYTE = 8;
-
 /// needs a bidirectional iterator
 template <typename Iterator> inline uint8_t byteFromBoolContainer(Iterator lsb) {
   uint8_t ret = 0;
   Iterator it = lsb;
   // advancing one too far is OK because of the "one past the end" iterator.
-  std::advance(it, BITS_PER_BYTE);
-  for (int count = BITS_PER_BYTE; count != 0; --count) {
+  std::advance(it, CHAR_BIT);
+  for (int count = CHAR_BIT; count != 0; --count) {
     // can unconditionally move backwards because we moved it one too far.
     --it;
     if (*it) {
@@ -88,7 +87,7 @@ template <typename Container> inline uint8_t byteFromBoolContainerAtBit(Containe
 }
 
 template <typename Container> inline uint8_t byteFromBoolContainerAtByte(Container &&c, std::size_t b) {
-  return byteFromBoolContainerAtBit(std::forward<Container>(c), b * BITS_PER_BYTE);
+  return byteFromBoolContainerAtBit(std::forward<Container>(c), b * CHAR_BIT);
 }
 
 int main() {
