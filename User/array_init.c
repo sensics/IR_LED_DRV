@@ -38,15 +38,39 @@
 /* - none - */
 
 // clang-format off
+
+#ifdef HDK2_HARDWARE
+/*
+Input data producing this mask (HDK2 hardware):
+/// Masked LEDs include the six not present in this hardware revision, with additional masked LEDs
+/// informed by BrightNeighbors using the distance-cost method with 5 passes (4 LEDs). The last LED
+/// suggsted by the algorithm would have been #5, which would have left one side of the HMD quite low
+/// in LEDs, so the second-highest cost from that round, #26, was hand chosen instead.
+static const auto DISABLED_TARGET0_BEACONS = {
+    /// beacons not present in this hardware revision
+    12, 13, 14, 25, 27, 28,
+    /// beacons disabled due to interference
+    33, 18, 32, 26};
+
+/// 1-based indices WRT the tracking software of the beacons on the rear that never light up anyway.
+static const auto DISABLED_TARGET1_BEACONS = {1, 4};
+*/
+EEPROM uint8_t default_mask[LED_LINE_LENGTH] = {0xc9, 0xf3, 0x17, 0xff, 0x6f};
+
+#else
+// full beacon set
 /*
 Input data producing this mask:
 /// 1-based indices WRT the tracking software of beacons we'd like to disable.
+/// Masked LEDs determined by BrightNeighbors using distance-cost method, 7 passes (6 LEDs).
 static const auto DISABLED_TARGET0_BEACONS = {33, 13, 18, 32, 34, 5};
 
 /// 1-based indices WRT the tracking software of the beacons on the rear that never light up anyway.
 static const auto DISABLED_TARGET1_BEACONS = {1, 4};
 */
 EEPROM uint8_t default_mask[LED_LINE_LENGTH] = {0xf1, 0xff, 0xb7, 0xbf, 0x6f};
+#endif
+
 
 #if 1
 EEPROM uint8_t default_pattern_array[PATTERN_COUNT][LED_LINE_LENGTH] =
