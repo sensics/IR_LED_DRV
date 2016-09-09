@@ -45,9 +45,22 @@
 #include <utility>
 #include <vector>
 
-static const int MAX_AUTO_RUNS = 7;
-
 using BeaconList = std::vector<int>;
+
+// these are physically not present on HDK2 hardware.
+static const BeaconList HDK2_BEACON_REMOVALS = {12, 13, 14, 25, 27, 28};
+
+// define this to start optimization with those beacons disabled.
+#define HDK2_HARDWARE
+
+#ifdef HDK2_HARDWARE
+// Disable 4 LEDs (beyond those not present.)
+static const int MAX_AUTO_RUNS = 5;
+#else
+// Disable 6 LEDs
+static const int MAX_AUTO_RUNS = 7;
+#endif
+
 using Eigen::Vector3d;
 
 inline double beaconSquaredDistance(Point3Vector const &locationVec, int a, int b) {
@@ -315,6 +328,10 @@ void printOutput(int runNumber, std::vector<int> const &maskList, AdjacentBright
 
 void autoCreateMask(int maxRuns, BeaconCostComparator const &comparator) {
   std::vector<int> maskList;
+#ifdef HDK2_HARDWARE
+  // these are physically not present on HDK2 hardware.
+  maskList = HDK2_BEACON_REMOVALS;
+#endif
   /// turn off up to 4 leds (running 5 passes)
   for (int i = 0; i < MAX_AUTO_RUNS; ++i) {
     auto adj =
